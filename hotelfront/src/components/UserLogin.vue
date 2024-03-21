@@ -1,21 +1,23 @@
 <template>
-  <img alt="Vue logo" src="../assets/logo.png">
-  <div v-if="!isLoggedIn" class="message-input">
-    <h1>用户登录</h1>
-    <form @submit.prevent="login" ref="loginForm">
-      <div class="label-container">
-        <label1 for="roomid" style="font-size: 25px;" >房间号：</label1>
-        <input type="text" id="roomid" v-model="roomid" required>
-      </div>
-      <div class="label-container">
-        <label1 for="consumername" style="font-size: 25px;">客户名：</label1>
-        <input type="text" id="consumername" v-model="consumername" required>
-      </div>
-      <div class="login-button">
-        <button>登录</button>
-      </div>
-    </form>
-  </div>
+  <div class="user-login">
+    <img alt="Vue logo" src="../assets/logo.png">
+    <div v-if="!isLoggedIn" class="message-input">
+      <h1>用户登录</h1>
+      <form @submit.prevent="login" ref="loginForm">
+        <div class="label-container">
+          <label1 for="roomid" style="font-size: 25px;">房间号：</label1>
+          <input type="text" id="roomid" v-model="roomid" required>
+        </div>
+        <div class="label-container">
+          <label1 for="consumername" style="font-size: 25px;">客户名：</label1>
+          <input type="text" id="consumername" v-model="consumername" required>
+        </div>
+        <div class="login-button">
+          <button>登录</button>
+        </div>
+      </form>
+    </div>
+    </div>
 </template>
 
 
@@ -42,28 +44,28 @@ export default {
 }
 </script>
 
-<style>
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background-image: url(''); 
-  background-size: 100%;
-  font-family: 'Roboto', sans-serif; 
+<style scope>
+.user-login {
+  background-image: url('../assets/hotel.png');
+  background-size: cover;
+  background-position-x: center;
+  height:100%;
+  font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #ffffff; 
-  margin-top: 10%;
+  color: #ffffff;
+  margin-top: 0%;
+  margin-bottom: 0%;
   overflow: hidden;
 }
 
 .label-container {
   margin-bottom: 20px;
+}
+
+img {
+  margin-top: 10%;
 }
 
 button {
@@ -79,6 +81,7 @@ button {
   border-radius: 5px; 
   cursor: pointer; 
   font-size: 16px;
+  margin-bottom: 18%;
 }
 
 input {
