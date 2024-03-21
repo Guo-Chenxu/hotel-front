@@ -51,7 +51,7 @@ html, body {
 }
 
 body {
-  background-image: url('../assets/hotel.png'); 
+  background-image: url(''); 
   background-size: 100%;
   font-family: 'Roboto', sans-serif; 
   -webkit-font-smoothing: antialiased;
