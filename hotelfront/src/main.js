@@ -4,11 +4,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import UserLogin from './components/UserLogin.vue'
 import CustomerSnack from './components/CustomerSnack.vue'
-import VueRouter from 'vue-router';
+import UserView from './components/UserView.vue'
 
 const routes = [
     { path: '/', component: UserLogin },
-    { path: '/CustomerSnackView',component:CustomerSnack}
+    { path: '/CustomerSnackView', component: CustomerSnack },
+    { path: '/uservieW',component: UserView}
 ]
 
 const router = createRouter({
