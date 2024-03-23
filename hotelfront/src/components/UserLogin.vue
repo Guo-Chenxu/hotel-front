@@ -9,7 +9,7 @@
           <input type="text" id="roomid" v-model="roomid" required>
         </div>
         <div class="label-container">
-          <label1 for="consumername" style="font-size: 25px;">客户名：</label1>
+          <label for="consumername" style="font-size: 25px;">客户名：</label>
           <input type="text" id="consumername" v-model="consumername" required>
         </div>
         <div class="login-button">
@@ -44,8 +44,10 @@ export default {
 }
 </script>
 
-<style scope>
+<style scoped>
 .user-login {
+  justify-content: center;
+  align-items: center;
   background-image: url('../assets/hotel.png');
   background-size: cover;
   background-position-x: center;
@@ -68,20 +70,23 @@ img {
   margin-top: 10%;
 }
 
-button {
+.login-button {
   margin-top: 12px;
+  margin-left: 7px;
+  border: none; 
+  margin-bottom: 18%;
+  align-self: center;
+}
+
+button {
   padding-top: 4px;
   padding-bottom: 4px;
   padding-right: 68px;
   padding-left: 68px;
-  margin-left: 7px;
-  background-color: rgba(150, 150, 150, 0.224); 
-  color: #ffffff; 
-  border: none; 
-  border-radius: 5px; 
-  cursor: pointer; 
   font-size: 16px;
-  margin-bottom: 18%;
+  color: #ffffff;
+  border: none;
+  background-color: rgba(150, 150, 150, 0.224);
 }
 
 input {
@@ -96,7 +101,7 @@ input {
     margin-bottom: 12px;
 }
 
-label1 {
+label {
     color: #f0f0f4; 
 }
 
