@@ -3,15 +3,27 @@
         <div class="rectangle">
             <h1 class="title">服务列表</h1>
             <div class="rectangle1-container">
-                <div class="rectangle1"></div>
-                <div class="rectangle2"></div>
-                <div class="rectangle5"></div>
+                <div class="rectangle1">
+                    <h2 class="cool">申请纳凉</h2>
+                </div>
+                <div class="rectangle2">
+                    <h2 class="cook">进行点餐</h2>
+                </div>
+                <div class="rectangle5">
+                    <h2 class="clean">打扫卫生</h2>
+                </div>
             </div>
             <div class="rectangle1-container2">
-                <div class="rectangle3"></div>
-                <div class="rectangle4"></div>
+                <div class="rectangle3">
+                    <h2 class="detail">查看订单</h2>
+                </div>
+                <div class="rectangle4">
+                    <h2 class="more">更多服务</h2>
+                </div>
             </div>
-            <button>退订房间</button>
+            <div class="log-out">
+                <button @click="logout">退订房间</button>
+            </div>
         </div>
     </div>
 </template>
@@ -29,12 +41,16 @@ export default {
         }
     },
     methods: {
-        
+        logout() {
+            if (confirm('确定要登出吗？')) {
+                this.$router.push('/');
+            }
+        }
     }
 }
 </script>
 
-<style scope>
+<style scoped>
 .user-view {
     background-image: url('../assets/userview.png');
     background-size: cover;
@@ -116,7 +132,7 @@ export default {
 }
 .rectangle4 {
     width: 350px;
-    height: 380px;
+    height: 370px;
     background-color: #52dbbb3b;
     margin-left: 10px;
     margin-right: 10px;
@@ -127,16 +143,21 @@ export default {
 .rectangle1:last-child {
     margin-right: 0;
 }
-button {
-position: absolute;
+.log-out {
+    position: absolute;
     bottom: -21%;
+    margin-bottom: 20%;
     right: 8%;
     z-index: 10;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-right: 40px;
-    padding-left: 40px;
+}
+
+button{
+    border:none;
     background-color: #fbf9f979;
     color: #022d19;
+    padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 40px;
+        padding-left: 40px;
 }
 </style>
