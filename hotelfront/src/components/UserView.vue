@@ -87,9 +87,9 @@ export default {
     height: 100%;
 }
 .rectangle {
-    margin: 5% auto 4%;
-    height: 750px;
-    width: 1480px;
+    height: 80%;
+    width: 88%;
+    margin: 5% auto 10.4%;
     background-color: #fafafa7b;
     border-radius: 20px;
 }
