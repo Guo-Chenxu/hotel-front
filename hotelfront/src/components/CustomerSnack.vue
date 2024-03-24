@@ -1,118 +1,192 @@
 <template>
-    <div>
-        <h2>餐饮服务</h2>
+    <div class="food-selection">
+        <el-row class="title">
+            <el-col :span="30">
+                <h2>餐饮服务</h2>
+            </el-col>
+        </el-row>
 
-        <!-- 第一个档位 -->
-        <div>
-            <img src="../assets/first-level-snack.webp" alt="First Snack Level" style="width: 200px; height: 300px;">
-            <button @click="requestFirstLevelFood">第一档位餐饮</button>
-        </div>
-
-        <!-- 第二个档位 -->
-        <div>
-            <img src="../assets/second-level-snack.webp" alt="Second Snack Level" style="width: 200px; height: 300px;">
-            <button @click="requestSecondLevelFood">第二档位餐饮</button>
-        </div>
-
-        <!-- 第三个档位 -->
-        <div>
-            <img src="../assets/third-level-snack.webp" alt="Third Snack Level" style="width: 200px; height: 300px;">
-            <button @click="requestThirdLevelFood">第三档位餐饮</button>
-        </div>
-
-        <div v-if="!requestAccepted">
-
-        </div>
-
-        <div v-else>
-            <p v-if="!canceling">餐饮请求已被接受</p>
-            <p v-if="canceling">{{ cancelMessage }}</p>
-        </div>
+        <el-row class="tier-container">
+            <el-col :span="8" v-for="tier in tiers" :key="tier.id">
+                <div class="tier">
+                    <div class="tier-header">
+                        <h3>{{ tier.name }}</h3>
+                        <p class="total-price">总价：{{ calculateTotalPrice(tier.foods) }}</p>
+                    </div>
+                    <ul class="food-list">
+                        <li v-for="food in tier.foods" :key="food.id">
+                            <span class="food-name">{{ food.name }}</span>
+                            <span class="food-price">价格: {{ food.price }}</span>
+                        </li>
+                    </ul>
+                    <div class="button-wrapper">
+                        <el-button @click="selectTier(tier.id)">选择该档位</el-button>
+                    </div>
+                    
+                </div>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'CustomerSnack',
     data() {
         return {
-            requestAccepted: false,
-            websocket: null,
-            canceling: false,
-            cancelMessage: ''
+            selectedTier: null,
+            tiers: [
+                {
+                    id: 1,
+                    name: '档位一',
+                    foods: [
+                        { id: 1, name: '食物1', price: 10 },
+                        { id: 2, name: '食物2', price: 12 },
+                    ]
+                },
+                {
+                    id: 2,
+                    name: '档位二',
+                    foods: [
+                        { id: 3, name: '食物10', price: 15 },
+                        { id: 4, name: '食物4', price: 18 },
+                    ]
+                },
+                {
+                    id: 3,
+                    name: '档位三',
+                    foods: [
+                        { id: 5, name: '食物5', price: 20 },
+                        { id: 6, name: '食物6', price: 25 },
+                    ]
+                }
+            ],
+            websocket: null
         };
     },
     mounted() {
-        this.connectWebSocket();
+        this.websocket = new WebSocket(''); 
+        this.websocket.onmessage = this.handleWebSocketMessage;
+    },
+    beforeDestroy() {
+        if (this.websocket) {
+            this.websocket.close();
+        }
     },
     methods: {
-        connectWebSocket() {
-            this.websocket = new WebSocket("address");
-
-            this.websocket.onopen = () => {
-                console.log("WebSocket 连接已开启");
-            };
-
-            this.websocket.onmessage = event => {
-                const data = JSON.parse(event.data);
-                if (data.requestAccepted) {
-                    this.requestAccepted = true;
-                } else {
-                    this.requestAccepted = false;
-                }
-            };
-
-            this.websocket.onclose = () => {
-                console.log("WebSocket 连接已关闭");
-            };
-
-            this.websocket.onerror = error => {
-                console.error("WebSocket 连接出错:", error);
-            };
+        handleWebSocketMessage(event) {
+            const message = JSON.parse(event.data);
+            
+            const tier = this.tiers.find(tier => tier.id === message.tierId);
+            if (tier) {
+                // 更新该档位的食物信息
+                tier.foods.push(message.foodDetails);
+            }
         },
-        requestFirstLevelFood() {
-            const message = { type: "requestFirstLevelFood" };
+        selectTier(tierId) {
+            // 在这里向后端发送选择档位的请求
+            
+            const message = { action: 'selectTier', tierId };
             this.websocket.send(JSON.stringify(message));
         },
-        requestSecondLevelFood() {
-            const message = { type: "requestSecondLevelFood" };
-            this.websocket.send(JSON.stringify(message));
-        },
-        requestThirdLevelFood() {
-            const message = { type: "requestThirdLevelFood" };
-            this.websocket.send(JSON.stringify(message));
+        calculateTotalPrice(foods) {
+            return foods.reduce((total, food) => total + food.price, 0);
         }
     }
 };
 </script>
 
-
-<style scoped>
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
+<style>
+.food-selection {
+    height: 100vh;
+    background-image: url('../assets/点餐背景.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-button:hover {
-    background-color: #0056b3;
+.title h2 {
+    font-size: 50px; 
+    
+    color: #333333;
 }
 
-img {
-    display: block;
-    margin: 0 auto;
+
+.title {
+    width: 100%;
+    text-align: center;
+    margin-top: 50px;
+
+    margin-bottom: 30px;
+
+}
+
+.tier-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 80%;
+    height: 200%;
+}
+
+.tier {
+    width: 100%;
+    padding: 40px;
+    background: linear-gradient(to right, #f1e0b5, #ffffff); 
+   
+    border-radius: 20px;
+
+    opacity: 0.8;
+    
+    height: 300px; 
+    color: #000000; 
+}
+
+.tier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.food-list {
+    list-style: none;
+    padding: 0;
+}
+
+.food-list li {
     margin-bottom: 10px;
 }
 
-div {
-    text-align: center;
+.food-name {
+    font-weight: bold;
 }
 
-div>div {
-    display: inline-block;
+.food-price {
+    margin-left: 10px;
 }
+
+.el-button:hover {
+    border-color: #f7f9f7;
+}
+
+.button-wrapper {
+    margin-top: 220px; 
+    background: linear-gradient(to right, #f1b560, #cfcc30);
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: #ffffff; 
+    border: none; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease; 
+}
+
+
+.button-wrapper:hover {
+    background: linear-gradient(to right, #cfcc30, #f1b560); 
+}
+
+
+
 </style>

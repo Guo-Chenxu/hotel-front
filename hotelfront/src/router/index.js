@@ -4,9 +4,7 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
   {
-    path: '/CustomerSnackView',
-    name: 'CustomerSnackView',
-    component: () => import( '../views/CustomerSnackView.vue')
+    
   }
 ]
 

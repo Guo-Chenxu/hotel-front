@@ -8,7 +8,7 @@ import UserView from './components/UserView.vue'
 
 const routes = [
     { path: '/', component: UserLogin },
-    { path: '/CustomerSnackView', component: CustomerSnack },
+    { path: '/CustomerSnack', component: CustomerSnack },
     { path: '/uservieW',component: UserView}
 ]
 
