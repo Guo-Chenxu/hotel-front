@@ -3,7 +3,7 @@
         <div class="rectangle">
             <h1 class="title">服务列表</h1>
             <div class="rectangle1-container">
-                <router-link to="/CustomerSnackView" class="router-link1">
+                <router-link to="/CustomerSnack" class="router-link1">
                     <div class="rectangle1" :class="{ 'enlarge': isHover1 }" @mouseover="isHover1 = true"
                         @mouseleave="isHover1 = false">
                         <!-- <h2 class="cook">进行点餐</h2> -->
@@ -11,7 +11,7 @@
                         <h2 class="cook">进行点餐</h2>
                     </div>
                 </router-link>
-                <router-link to="/" class="router-link1">
+                <router-link to="/Clean" class="router-link1">
                     <div class="rectangle2 " :class="{ 'enlarge': isHover2 }" @mouseover="isHover2 = true"
                         @mouseleave="isHover2 = false">
                         <img class="logo3" src="../assets/打扫.png">
