@@ -84,45 +84,46 @@ export default {
     text-align: center;
     color: #ffffff;
     overflow: hidden;
-    height: 100%;
+    height: 98.1vh;
 }
 .rectangle {
-    height: 80%;
-    width: 88%;
     margin: 5% auto 10.4%;
+    height: 80.5vh;
+    width: 88%;
+    align-items: center;
     background-color: #fafafa7b;
     border-radius: 20px;
 }
 .title {
     color: #7f7fd9b4;
-    font-size: 70px;
+    font-size: 435%;
 }
 .rectangle1-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 1300px;
-    margin: 0 auto;
+    width: 95%;
     margin-top: -7%;
+    margin-bottom: -10%;
     position: relative;
 }
 .rectangle1-container2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 850px;
-    margin: -5% auto;
+    margin: -20% auto 1%;
+    width: 60%;
+    height: 90%;
     position: relative;
 }
 .rectangle1 {
-    width: 400px;
-    height: 370px;
+    width: 47vh;
+    height: 38vh;
     background-color: #d67e9a30;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 5vh;
     border-radius: 20px;
     position: relative;
-    z-index: 1;
+    z-index: 10;
     transition: transform 0.3s ease, z-index 0s 0.3s;
 }
 .router-link1 {
@@ -135,44 +136,38 @@ export default {
 }
 
 .rectangle2 {
-    width: 380px;
-    height: 300px;
+    width: 45vh;
+    height: 35vh;
     background-color: #97bfdf51;
-    margin-left: 10px;
-    margin-right: 10px;
     border-radius: 20px;
-    z-index: 5;
-    transition: transform 0.3s ease, z-index 0s 0.3s;
-}
-.rectangle5 {
-    width: 400px;
-    height: 450px;
-    background-color: #457af430;
-    margin-left: 10px;
-    margin-right: 10px;
-    border-radius: 20px;
+    position: relative;
     z-index: 1;
     transition: transform 0.3s ease, z-index 0s 0.3s;
 }
-.rectangle3 {
-    width: 400px;
-    height: 300px;
-    background-color: #caa17c3b;
-    margin-left: 10px;
-    margin-right: 10px;
+.rectangle5 {
+    width: 43vh;
+    height: 50vh;
+    background-color: #457af430;
     border-radius: 20px;
-    z-index: 5;
+    position: relative;
+    z-index: 19;
+    transition: transform 0.3s ease, z-index 0s 0.3s;
+}
+.rectangle3 {
+    width: 44vh;
+    height: 33vh;
+    background-color: #caa17c3b;
+    border-radius: 20px;
+    z-index: 15;
     transition: transform 0.3s ease, z-index 0s 0.3s;
 }
 .rectangle4 {
-    width: 350px;
-    height: 370px;
+    width: 39vh;
+    height: 40vh;
     background-color: #52dbbb3b;
-    margin-left: 10px;
-    margin-right: 10px;
     border-radius: 20px;
-    margin: -9.5% auto;
-    z-index: 5;
+    position: relative;
+    z-index: 15;
     transition: transform 0.3s ease, z-index 0s 0.3s;
 }
 .rectangle1:last-child {
@@ -198,56 +193,56 @@ button{
 .cool {
     font-family: '华文宋体', sans-serif;
     margin-top: 10%;
-    font-size: 40px;
+    font-size: 4.5vh;
     opacity: 0.88;
 }
 .cook {
     font-family: '华文宋体', monospace;
     margin-top: 10%;
-    font-size: 40px;
+    font-size: 4.5vh;
 }
 .clean {
     font-family: '华文宋体', sans-serif;
     margin-top: 10%;
-    font-size: 40px;
+    font-size: 4.5vh;
 }
 .detail {
     font-family: '华文宋体', sans-serif;
     margin-top: 5%;
-    font-size: 40px;
+    font-size: 4.5vh;
 }
 .more {
     font-family: '华文宋体', sans-serif;
     margin-top: 10%;
-    font-size: 40px;
+    font-size: 4.5vh;
 }
 
 .logo2 {
-    margin-top: 29%;
-    width: 125px;
+    margin-top: 20%;
+    width: 13vh;
     opacity: 0.6;
     height: auto;
 }
 .logo3 {
     margin-top: 12.5%;
-    width: 125px;
+    width: 13vh;
     height: auto;
 }
 .logo1 {
     margin-top: 25%;
-    width: 155px;
+    width: 15vh;
     opacity: 0.9;
     height: auto;
 }
 .logo4 {
     margin-top: 12%;
-    width: 125px;
+    width: 13vh;
     opacity: 0.75;
     height: auto;
 }
 .logo5 {
     margin-top: 28%;
-    width: 125px;
+    width: 13vh;
     opacity: 1;
     height: auto;
 }
