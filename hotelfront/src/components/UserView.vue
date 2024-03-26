@@ -11,7 +11,7 @@
                         <h2 class="cook">进行点餐</h2>
                     </div>
                 </router-link>
-                <router-link to="/Clean" class="router-link1">
+                <router-link to="/" class="router-link1">
                     <div class="rectangle2 " :class="{ 'enlarge': isHover2 }" @mouseover="isHover2 = true"
                         @mouseleave="isHover2 = false">
                         <img class="logo3" src="../assets/打扫.png">
