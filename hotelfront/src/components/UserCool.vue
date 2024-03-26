@@ -84,17 +84,19 @@ export default {
 .air-conditioner-service {
     height: 100vh;
     background-image: url('../assets/usercool.png');
-    background-size: cover;
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
 }
 
+
 .header {
-    margin-bottom: 20px;
-    color: #FFFFFF;
+    margin-right: 700px;
+    font-size: 40px;
+    margin-top:-20px;
+    color:#ffffff;
 }
 
 .content {
@@ -117,10 +119,11 @@ export default {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
+    color:rgb(28, 26, 14)
 }
 
 .status-display {
-    opacity: 0.8;
+    
     margin-top: 20px;
     border-radius: 20px;
     display: flex;
@@ -131,7 +134,7 @@ export default {
 
     margin-bottom: 20px;
 
-    background-color: #00000096;
+    background: linear-gradient(to right, #e65fd49e, #deea35b9 );
 
 }
 
@@ -144,29 +147,28 @@ export default {
     font-size: 30px;
     font-family: monospace;
     margin-right: 5px;
-    background-color: #00000096;
-    color: #FFFFFF;
+    background: linear-gradient(to bottom, #e65fd49e, #deea35b9 );
+    color: #e22929;
     padding: 5px;
     border-radius: 5px;
-    opacity: 0.8;
+
 }
 
 .temperature {
     font-size: 40px;
-    opacity: 0.8;
+    
 }
 
 .fan-speed,
 .power-status {
     font-size: 14px;
-    color: #FFFFFF;
+    color: #f8f8f8;
 }
 
 .subtext {
     font-size: 16px;
     margin-left: 5px;
-    color: #FFFFFF;
-    
+    color: #f8f8f8;
 }
 
 .control-buttons {
@@ -175,8 +177,8 @@ export default {
     justify-content: space-around;
     margin-top: 10px;
     height: 25px;
-    color: #FFFFFF;
-    background: linear-gradient(to right, #7a959f 0%, #66bdff 100%);
+    color: #7c1b1b;
+    background: linear-gradient(to right, #e65fd49e, #deea35b9 );
 
 }
 
@@ -196,7 +198,7 @@ export default {
 
     margin-bottom: 20px;
 
-    background-color: #00000096;
+    background: linear-gradient(to left, #e65fd49e, #deea35b9 );
 
 }
 </style>
