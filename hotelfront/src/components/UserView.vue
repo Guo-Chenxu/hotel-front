@@ -18,7 +18,7 @@
                         <h2 class="clean">打扫卫生</h2>
                     </div>
                 </router-link>
-                <router-link to="/" class="router-link1">
+                <router-link to="/Usercool" class="router-link1">
                     <div class="rectangle5" :class="{ 'enlarge': isHover3 }" @mouseover="isHover3 = true"
                         @mouseleave="isHover3 = false">
                         <img class="logo1" src="../assets/空调.png">
