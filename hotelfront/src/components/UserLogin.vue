@@ -53,7 +53,7 @@ export default {
 
 <style scoped>
 .user-login {
-  background-image: url('../assets/hotel3.png');
+  background-image: url('../assets/hotel1.png');
   background-color: #ffffffab;
   background-size: cover;
   background-position-x: center;
