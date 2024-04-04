@@ -1,7 +1,7 @@
 <template>
     <div class="air-conditioner-service">
         <div class="header">
-            <h1>空调纳凉服务</h1>
+            
         </div>
         <div class="content">
             <!-- 左侧空调控制面板 -->
@@ -29,8 +29,7 @@
 
                 <!-- 下半部分：调节按钮 -->
                 <div class="control-buttons">
-                    <el-button @click="togglePower" :type="power ? 'danger' : 'primary'">{{ power ? '关闭' : '开启'
-                        }}</el-button>
+                    <el-button @click="togglePower" :type="power ? 'danger' : 'primary'">{{ power ? '关闭' : '开启' }}</el-button>
                     <el-button @click="increaseTemperature" :disabled="!power">+</el-button>
                     <el-button @click="decreaseTemperature" :disabled="!power">-</el-button>
                     <el-button @click="adjustFanSpeed" :disabled="!power">调节风速</el-button>
@@ -50,155 +49,94 @@
 
 <script>
 export default {
+    name: 'UserCool',
     data() {
         return {
-            power: false,
-            temperature: 22,
-            fanSpeed: 2,
-            accumulatedCost: 0
-        };
+            currentTemperature: 25, // 当前温度
+            targetTemperature: 20, // 预期温度
+            fanSpeed: '中速', // 风速
+            power: true, // 空调开关状态
+            accumulatedCost: 0, // 累计费用
+        }
     },
     methods: {
         togglePower() {
             this.power = !this.power;
-            if (this.power) {
-                // 开启空调时的逻辑
-            } else {
-                // 关闭空调时的逻辑
-            }
         },
         increaseTemperature() {
-            if (this.power && this.temperature < 30) this.temperature++;
+            this.targetTemperature++;
         },
         decreaseTemperature() {
-            if (this.power && this.temperature > 16) this.temperature--;
+            this.targetTemperature--;
         },
         adjustFanSpeed() {
-            if (this.power && this.fanSpeed < 3) this.fanSpeed++;
+            // 调节风速的逻辑
         }
     }
-};
+}
 </script>
 
 <style scoped>
 .air-conditioner-service {
     height: 100vh;
-    background-image: url('../assets/usercool.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: #ffffff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
-
 .header {
-    margin-right: 700px;
-    font-size: 40px;
-    margin-top:-20px;
-    color:#ffffff;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .content {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
 }
 
 .control-panel,
 .fees-panel {
-    
-    width: 45%;
+    width: 40%;
     padding: 20px;
     border-radius: 10px;
-    border-color: #111;
+    margin-top: 50px;
+    margin-right: 20px;
+    margin-left: 40px;
+    background-color: #f5f5f5;
 }
 
 .title {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
-    color:rgb(28, 26, 14)
 }
 
 .status-display {
-    
     margin-top: 20px;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 250px;
-
-    margin-bottom: 20px;
-
-    background: linear-gradient(to right, #e65fd49e, #deea35b9 );
-
 }
 
 .led-row {
     display: flex;
     align-items: center;
-}
-
-.led-digit {
-    font-size: 30px;
-    font-family: monospace;
-    margin-right: 5px;
-    background: linear-gradient(to bottom, #e65fd49e, #deea35b9 );
-    color: #e22929;
-    padding: 5px;
-    border-radius: 5px;
-
-}
-
-.temperature {
-    font-size: 40px;
-    
-}
-
-.fan-speed,
-.power-status {
-    font-size: 14px;
-    color: #f8f8f8;
+    margin-bottom: 10px;
 }
 
 .subtext {
-    font-size: 16px;
-    margin-left: 5px;
-    color: #f8f8f8;
+    margin-left: 10px;
 }
 
 .control-buttons {
-    border-radius: 20px;
+    margin-top: 20px;
     display: flex;
-    justify-content: space-around;
-    margin-top: 10px;
-    height: 25px;
-    color: #7c1b1b;
-    background: linear-gradient(to right, #e65fd49e, #deea35b9 );
-
-}
-
-.control-buttons>.el-button {
-    margin: 0 5px;
+    justify-content: space-between;
 }
 
 .cost-display {
-    opacity: 0.8;
     margin-top: 20px;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 250px;
-
-    margin-bottom: 20px;
-
-    background: linear-gradient(to left, #e65fd49e, #deea35b9 );
-
+    font-weight: bold;
 }
 </style>

@@ -57,11 +57,12 @@ export default {
 .user-window {
     display: flex;
     height: 97.8vh;
+    
 }
 
 .sidebar {
     margin-top: 0.3vh;
-    width: 25vh;
+    width: 10%; /* 将宽度设置为百分比值 */
     background-color: #f5f9eb;
 }
 
@@ -79,8 +80,9 @@ export default {
 }
 
 .content {
+    
     flex: 1;
     padding: 2px;
-    background-color: #e2edd9af;
+    width: 90%;
 }
 </style>
