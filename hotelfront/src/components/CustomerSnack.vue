@@ -1,114 +1,44 @@
 <template>
-    <div class="carousel-container">
-      <h2 class="carousel-title">Welcome to Our Carousel</h2>
-      <div class="carousel-inner" :style="{ 'transform': `translateX(-${currentIndex * (100 / 3)}%)` }">
-        <div 
-          class="carousel-item" 
-          v-for="(item, index) in items" 
-          :key="index"
-          :class="{ 'active': index === currentIndex + 1, 'blur': index === currentIndex  || index === currentIndex + 2 }"
-        >
-          <div class="card">
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.description }}</p>
-          </div>
-        </div>
-      </div>
-      <p class="carousel-footer">Explore more with our carousel!</p>
-      <button @click="prev" class="arrow arrow-left">&lt;</button>
-      <button @click="next" class="arrow arrow-right">&gt;</button>
+    <div class="customer-snack">
+        <el-carousel :interval="4000" type="card" height="300px">
+            <el-carousel-item v-for="snack in snacks" :key="snack.title">
+                <el-card>
+                    <template #header>
+                        <div class="card-header">
+                            <span>{{snack.title}}</span>
+                        </div>
+                    </template>
+                    <p>{{ snack.description }}</p>
+                    <p>价格：{{ snack.price }} 元</p>
+                    <el-button>订餐</el-button>
+                </el-card>
+            </el-carousel-item>
+        </el-carousel>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        currentIndex: 1, 
-        items: [
-          { title: 'High-End Restaurant', description: 'Offering a five-star dining experience' },
-          { title: 'Homestyle Eatery', description: 'Comfortable family-style dining' },
-          { title: 'Fast Food', description: 'Quick, convenient, and tasty' },
-          { title: 'Dessert Shop', description: 'Exquisite desserts for a sweet life' },
-          { title: 'Coffee House', description: 'Relax and enjoy the coffee moment' },
+</template>
 
-        ],
-      };
-    },
-    methods: {
-      next() {
-        this.currentIndex = (this.currentIndex + 1) % this.items.length;
-      },
-      prev() {
-        this.currentIndex = (this.currentIndex - 1 + this.items.length) % this.items.length;
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .carousel-container {
-    overflow: hidden;
-    width: 600px; 
-    margin: 20px auto 0; 
-    position: relative;
-  }
-  
-  .carousel-title {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 100px;
-  }
-  
-  .carousel-footer {
-    text-align: center;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-  
-  .carousel-inner {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-  }
-  
-  .carousel-item {
-    width: 100%; 
-    flex: 0 0 33.3333%; 
-    display: flex;
-    justify-content: center;
-  }
-  
-  .card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin: 10px;
-    padding: 20px;
-    text-align: center;
-    width: 80%;
-    transition: transform 0.3s ease;
-  }
-  
-  .carousel-item.blur .card {
-    filter: blur(4px);
-  }
-  
-  .arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #fff;
-    border: none;
-    cursor: pointer;
-    z-index: 1000;
-  }
-  
-  .arrow-left {
-    left: 10px;
-  }
-  
-  .arrow-right {
-    right: 10px;
-  }
-  </style>
-  
+<script>
+export default {
+    data() {
+        return {
+            snacks: [
+                { title: "档位一", description: "美味餐饮信息1", price: 20 },
+                { title: "档位二", description: "美味餐饮信息2", price: 30 },
+                { title: "档位三", description: "美味餐饮信息3", price: 40 },
+                // 添加更多档位信息...
+            ]
+        };
+    }
+};
+</script>
+
+<style scoped>
+.customer-snack {
+    width: 70%;
+    /* 调整宽度为您需要的大小 */
+    margin: 20% auto;
+
+}
+
+
+</style>

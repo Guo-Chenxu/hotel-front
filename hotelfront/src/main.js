@@ -8,6 +8,8 @@ import UserView from './components/UserView.vue'
 import UserCool from './components/UserCool.vue'
 import UserWindow from './components/UserWindow.vue'
 import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+
 const routes = [
     { path: '/', component: UserLogin },
     { path: '/CustomerSnack', component: CustomerSnack },
@@ -22,4 +24,7 @@ const router = createRouter({
     routes
 })
 
-const app = createApp(App).use(ElementPlus).use(router).mount('#app')
+const app = createApp(App)
+app.use(router)
+app.mount('#app')
+app.use(ElementPlus)
