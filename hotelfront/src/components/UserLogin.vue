@@ -10,13 +10,14 @@
           <h1>欢迎入住！</h1>
           <form @submit.prevent="login" ref="loginForm">
             <div class="label-container">
-              <label1 for="userid" style="font-size: 25px;">房间号：</label1>
-              <input type="text" id="userid" v-model="userid" required>
+              <label1 for="username" style="font-size: 25px;">房间号：</label1>
+              <input type="text" id="username" v-model="username" required>
             </div>
             <div class="label-container">
-              <label1 for="psd" style="font-size: 25px;">用户名：</label1>
-              <input type="text" id="psd" v-model="psd" required>
+              <label1 for="roomId" style="font-size: 25px;">用户名：</label1>
+              <input type="text" id="roomId" v-model="roomId" required>
             </div>
+            <h6 style="color: black">房间号1用户名1(以后删)</h6>
             <div class="login-button">
               <button>登录</button>
             </div>
@@ -29,27 +30,40 @@
 
 
 <script>
-
 export default {
   name: 'UserLogin',
   data() {
     return {
-      userid: '',
-      psd: '',
-      isLoggedIn: false
+      username: '', // 将userid改为username以匹配后端的参数名
+      roomId: '', // 添加roomId字段
+      isLoggedIn: false,
+      token: null // 添加token字段
     }
+  },
+  created() {
+    localStorage.clear();
   },
   methods: {
     login() {
-      if (this.userid === '1' && this.psd === '1') {
+      if (this.username == '1' && this.roomId == '1') {
+        // 设置token为一个随机字符串，模拟登录成功后后端返回的token
+        this.token = 'mocked_token';
+        // 标记用户为已登录状态
         this.isLoggedIn = true;
+        // 将登录状态保存到本地存储中 
+        // 只是测试用
+        localStorage.setItem('token', true);
+        
+        this.$router.push('/home'); // 在登录成功后立即跳转
       } else {
         window.alert('账号或密码错误');
       }
-    }
-  }
+    },
+  },
+
 }
 </script>
+
 
 <style scoped>
 .user-login {

@@ -16,20 +16,20 @@
 
 
 <script>
-import Page0 from './UserMain.vue';
-import Page1 from './UserCool.vue'; 
-import Page2 from './CustomerSnack.vue';
-import Page3 from './UserLogin.vue';
+import main from './UserMain.vue';
+import cool from './UserCool.vue'; 
+import snack from './UserSnack.vue';
+import login from './UserLogin.vue';
 
 export default {
     name: 'UserWindow',
     data() {
         return {
             sidebarItems: [
-                { name: '主页', component: 'Page0' }, 
-                { name: '纳凉服务', component: 'Page1' }, 
-                { name: '进行点餐', component: 'Page2' },
-                { name: '查看订单', component: 'Page3' }
+                { name: '主页', component: 'main' }, 
+                { name: '纳凉服务', component: 'cool' }, 
+                { name: '进行点餐', component: 'snack' },
+                { name: '查看订单', component: 'login' }
             ],
             currentPage: 0 
         };
@@ -45,10 +45,10 @@ export default {
         }
     },
     components: {
-        Page0,
-        Page1,
-        Page2,
-        Page3
+        main,
+        cool,
+        snack,
+        login
     }
 };
 </script>
@@ -62,8 +62,13 @@ export default {
 
 .sidebar {
     margin-top: 0.3vh;
-    width: 10%; /* 将宽度设置为百分比值 */
-    background-color: #f5f9eb;
+    width: 10%;
+    background-color: #f0f0f0;
+    /* 使用 Flex 布局 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .sidebar-item {
@@ -71,12 +76,8 @@ export default {
     cursor: pointer;
 }
 
-.sidebar-item:hover {
-    background-color: #f0e6e6;
-}
-
 .sidebar-item.active {
-    background-color: #bbb;
+    background-color: #fbfbfb;
 }
 
 .content {

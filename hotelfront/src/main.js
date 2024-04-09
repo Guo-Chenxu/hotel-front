@@ -1,24 +1,32 @@
+// main.js
+import { createApp } from 'vue';
+import App from './App.vue';
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
+import router from './router/index';
 
-import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
-import App from './App.vue'
-import UserLogin from './components/UserLogin.vue'
-import CustomerSnack from './components/CustomerSnack.vue'
-import UserCool from './components/UserCool.vue'
-import UserWindow from './components/UserWindow.vue'
-const routes = [
-    { path: '/', component: UserLogin },
-    { path: '/CustomerSnack', component: CustomerSnack },
-    { path: '/Usercool', component: UserCool },
-    { path: '/window', component: UserWindow },
-    { path: '/UserMain', component: UserWindow },
-]
+const app = createApp(App);
 
-const router = createRouter({
-    history: createWebHistory(),
-    routes
+// 注册路由导航守卫
+router.beforeEach((to, from, next) => {
+    const isLoggedIn = localStorage.getItem('token');
+
+    // 检查用户是否已登录
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!isLoggedIn) {
+            // 如果用户未登录，重定向到登录页面
+            next('/');
+        } else {
+            // 用户已登录，继续导航
+            next();
+        }
+    } else {
+        // 不需要鉴权的页面，直接继续导航
+        next();
+    }
 })
 
-const app = createApp(App)
-app.use(router)
-app.mount('#app')
+
+app.use(ElementPlus); 
+app.use(router);
+app.mount('#app'); 
