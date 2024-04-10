@@ -9,7 +9,6 @@
                   <span>空调控制面板</span>
                 </div>
               </template>
-  
           <!-- 上半部分：温度、风速、空调状态 -->
           <div class="status-display">
             <div class="led-row" style="margin-top: 0px;">
@@ -81,7 +80,7 @@
   
   <style scoped>
   .air-conditioner-service {
-    height: 100vh;
+    height: 100%;
     background-size: cover;
     background-position: center;
     background-color: #ffffff;

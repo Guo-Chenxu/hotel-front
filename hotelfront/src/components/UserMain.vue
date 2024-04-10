@@ -1,6 +1,6 @@
 <template>
     <div class="user-main">
-        <img src="../assets/userview.png" style="margin-left:130px;width: 100%; height: 100%; opacity: 0.5;">
+        <img src="../assets/userview.png" style="margin-left:130px;margin-right:-100px;width: 100%; height: 100%; opacity: 0.5;">
         <div class="rectangle">
             <div class="rectangle1">
                 <h1></h1>
@@ -34,7 +34,7 @@ export default {
 <style scoped>
 .user-main {
     background-size: cover;
-    background-position-x: center;
+    background-position: center;
     font-family: 'Roboto', sans-serif;
     text-align: center;
     color: #ffffff;

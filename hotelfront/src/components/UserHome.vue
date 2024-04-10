@@ -1,19 +1,22 @@
 <template>
     <div class="user-window">
-        <el-header class='header'>
-            <h1 class="title-logo">@BUPTER</h1>
-        </el-header>
         <el-container>
-            <el-aside class="sidebar">
-                <div v-for="(item, index) in sidebarItems" :key="index" class="sidebar-item"
-                    @click="showPage(index)" :class="{ active: currentPage === index }">
-                    {{ item.name }}
-                </div>
-            </el-aside>
-            <el-main class="main-content">
-                <component :is="currentPageComponent"></component>
-            </el-main>
+            <el-header class='header'>
+                <h1 class="title-logo">@BUPTER</h1>
+            </el-header>
+            <el-container>
+                <el-aside class="sidebar">
+                    <div v-for="(item, index) in sidebarItems" :key="index" class="sidebar-item"
+                        @click="showPage(index)" :class="{ active: currentPage === index }">
+                        {{ item.name }}
+                    </div>
+                </el-aside>
+                <el-main class="main-content">
+                    <component :is="currentPageComponent"></component>
+                </el-main>
+            </el-container>
         </el-container>
+        
     </div>
 </template>
 
@@ -59,7 +62,7 @@ export default {
 <style scoped>
 .user-window {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     position:fixed;
 }
 
@@ -77,7 +80,7 @@ export default {
 
 .sidebar {
     position:fixed;
-    height: 94vh;
+    height: 100%;
     width: 10%; /* 调整侧边栏宽度 */
     background-color: #f0f0f0;
     display: flex;
@@ -103,6 +106,7 @@ export default {
 
 .main-content {
     padding: 20px;
+    
 }
 
 /* 标题样式 */
@@ -112,6 +116,5 @@ h1 {
     padding: 10px;
 }
 
-/* 可以根据需要添加更多样式 */
 </style>
 
