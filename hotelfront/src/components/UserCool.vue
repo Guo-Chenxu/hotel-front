@@ -2,7 +2,6 @@
     <div class="air-conditioner-service">
       <!-- 放在整个页面的顶部 -->
       <el-alert v-if="power" title="开启成功" type="success" center show-icon class="floating-alert" />
-      <div class="header"></div>
       <div class="content">
         <el-card class="control-panel" shadow="always">
             <template #header>
@@ -106,7 +105,9 @@
     width: 40%;
     padding: 20px;
     border-radius: 10px;
-    margin: auto;
+    margin-top:60px;
+    margin-left: 450px;
+    
     margin-top:13%;
     
   }
@@ -146,8 +147,8 @@
   .floating-alert {
     position: fixed;
     margin:auto;
-    margin-top:10%;
-    margin-left:30%;
+    margin-top:9%;
+    margin-left:35%;
     width: 30%;
   }
   </style>

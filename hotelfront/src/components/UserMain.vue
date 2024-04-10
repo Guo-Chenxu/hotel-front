@@ -1,13 +1,12 @@
 <template>
     <div class="user-main">
-        <img src="../assets/userview.png" style="width: 100%; height: 100%; opacity: 0.5;">
+        <img src="../assets/userview.png" style="margin-left:130px;width: 100%; height: 100%; opacity: 0.5;">
         <div class="rectangle">
             <div class="rectangle1">
-                <h1>@ Bupter</h1>
+                <h1></h1>
                 <h2 class="cook">尊敬的会员</h2>
                 <h2 class="cook1">欢迎来到波普特</h2>
                 <h2 class="cook1">绿色酒店</h2>
-
             </div>
             <div class="rectangle2">
                 <h2 class="attentions">注意事项</h2>
@@ -40,12 +39,15 @@ export default {
     text-align: center;
     color: #ffffff;
     overflow: hidden;
-    height: 98.1vh;
-    width: 154vh;
+    height: 100vh;
+    width: 100%;
+    margin-top:-20px;
+    margin-left:-6px;
+    
 }
 .rectangle {
-    margin-top: -58%;
-    margin-left: 14vh;
+    margin-top: -52%;
+    margin-left: 40vh;
     margin-right: 20vh;
     height: 80.5vh;
     width: 125vh;

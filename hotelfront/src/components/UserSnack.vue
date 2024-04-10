@@ -1,6 +1,6 @@
 <template>
     <div class="customer-snack">
-        <el-carousel :interval="4000" type="card" height="300px">
+        <el-carousel :interval="4000" type="card" height="260px">
             <el-carousel-item v-for="snack in snacks" :key="snack.title">
                 <el-card>
                     <template #header>
@@ -36,8 +36,9 @@ export default {
 .customer-snack {
     width: 70%;
     /* 调整宽度为您需要的大小 */
-    margin: 20% auto;
-
+    margin: 10% auto;
+    margin-left:300px;
+    
 }
 
 

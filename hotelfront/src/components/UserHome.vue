@@ -1,23 +1,26 @@
 <template>
     <div class="user-window">
-        <div class="sidebar">
-            <div v-for="(item, index) in sidebarItems" :key="index" 
-                class="sidebar-item" 
-                @click="showPage(index)"
-                :class="{ active: currentPage === index }">
-                {{ item.name }}
-            </div>
-        </div>
-        <div class="content">
-            <component :is="currentPageComponent"></component>
-        </div>
+        <el-header class='header'>
+            <h1 class="title-logo">@BUPTER</h1>
+        </el-header>
+        <el-container>
+            <el-aside class="sidebar">
+                <div v-for="(item, index) in sidebarItems" :key="index" class="sidebar-item"
+                    @click="showPage(index)" :class="{ active: currentPage === index }">
+                    {{ item.name }}
+                </div>
+            </el-aside>
+            <el-main class="main-content">
+                <component :is="currentPageComponent"></component>
+            </el-main>
+        </el-container>
     </div>
 </template>
 
 
 <script>
 import main from './UserMain.vue';
-import cool from './UserCool.vue'; 
+import cool from './UserCool.vue';
 import snack from './UserSnack.vue';
 import login from './UserLogin.vue';
 
@@ -26,12 +29,12 @@ export default {
     data() {
         return {
             sidebarItems: [
-                { name: '主页', component: 'main' }, 
-                { name: '纳凉服务', component: 'cool' }, 
+                { name: '主页', component: 'main' },
+                { name: '纳凉服务', component: 'cool' },
                 { name: '进行点餐', component: 'snack' },
                 { name: '查看订单', component: 'login' }
             ],
-            currentPage: 0 
+            currentPage: 0
         };
     },
     computed: {
@@ -55,35 +58,60 @@ export default {
 
 <style scoped>
 .user-window {
+    width: 100%;
+    height: 100vh;
+    position:fixed;
+}
+
+.header {
+    background-color: #f0f0f0;
     display: flex;
-    height: 97.8vh;
-    
+    align-items: center;
+    padding: 10px;
+}
+
+.title-logo {
+    margin: 0;
+    font-size: 24px;
 }
 
 .sidebar {
-    margin-top: 0.3vh;
-    width: 10%;
+    position:fixed;
+    height: 94vh;
+    width: 10%; /* 调整侧边栏宽度 */
     background-color: #f0f0f0;
-    /* 使用 Flex 布局 */
     display: flex;
     flex-direction: column;
+    padding-top: 20px;
     justify-content: center;
-    align-items: center;
+    
 }
 
 .sidebar-item {
     padding: 15px;
     cursor: pointer;
+    transition: background-color 0.3s ease; 
+}
+
+.sidebar-item:hover {
+    background-color: #eaeaea; /* 鼠标悬停时的背景色 */
 }
 
 .sidebar-item.active {
-    background-color: #fbfbfb;
+    background-color: #fffefe;
 }
 
-.content {
-    
-    flex: 1;
-    padding: 2px;
-    width: 90%;
+.main-content {
+    padding: 20px;
 }
+
+/* 标题样式 */
+h1 {
+    font-size: 24px;
+    margin: 0;
+    padding: 10px;
+}
+
+/* 可以根据需要添加更多样式 */
 </style>
+
