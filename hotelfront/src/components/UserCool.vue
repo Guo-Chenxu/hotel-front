@@ -1,7 +1,9 @@
 <template>
   <div class="air-conditioner-service">
     <!-- 放在整个页面的顶部 -->
-    <el-alert v-if="showAlert" title="开启成功" type="success" center show-icon class="floating-alert" />
+    <el-alert v-if="showSuccessAlert" title="操作成功" type="success" center show-icon class="floating-alert" />
+    <el-alert v-if="showErrorAlert" title="操作失败" type="error" center show-icon class="floating-alert" />
+    <el-alert v-if="showConnectErrorAlert" title="连接失败" type="error" center show-icon class="floating-alert" />
     <div class="content">
       <el-card class="control-panel" shadow="always">
         <template #header>
@@ -30,10 +32,10 @@
 
         <!-- 下半部分：调节按钮 -->
         <div class="control-buttons">
-          <el-switch v-model="power" inline-prompt active-text="ON" inactive-text="OFF" />
-          <el-button @click="increaseTemperature" :disabled="power">+</el-button>
-          <el-button @click="decreaseTemperature" :disabled="power">-</el-button>
-          <el-button @click="adjustFanSpeed" :disabled="power">调节风速</el-button>
+          <el-switch v-model="power" inline-prompt active-text="ON" inactive-text="OFF" @change="handleSwitchChange" />
+          <el-button @click="increaseTemperature" :disabled="!power">+</el-button>
+          <el-button @click="decreaseTemperature" :disabled="!power">-</el-button>
+          <el-button @click="adjustFanSpeed" :disabled="!power">调节风速</el-button>
         </div>
       </el-card>
     </div>
@@ -41,56 +43,181 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+
+import { ref, onMounted } from 'vue'
 
 export default {
   name: 'UserCool',
   setup() {
-    const power = ref(false) 
-    const showAlert = ref(false) 
-    // TODO: 登录时后端返回temperture
-    const currentTemperature = ref(25) 
-    const targetTemperature = ref(20) 
-    const fanSpeed = ref(1) 
+    const power = ref(null)
+    const showSuccessAlert = ref(false)
+    const showErrorAlert = ref(false)
+    const showConnectErrorAlert = ref(false)
+    const currentTemperature = ref(null)
+    const targetTemperature = ref(null)
+    const fanSpeed = ref(null)
+    const price = ref(null)
 
-    
-    const ws = new WebSocket('ws://localhost:29010/api/customer/cool/turnOn')
+    const baseURL = 'ws://localhost:29010/api/customer/cool/'
 
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data)
-      if (message.code == 200) {
-        showAlert.value = true 
+    const handleSwitchChange = () => {
+      if (power.value) {
+        turnOnAC()
       } else {
-        console.error(message.message)
-
+        turnOffAC()
       }
     }
 
-    // 发送开启空调请求
+    /**
+     * @description: 开关空调接受返回响应函数
+     * @return {*}
+     */
+
+    const sendRequest = (url, message) => {
+      const ws = new WebSocket(url)
+
+      ws.onmessage = (event) => {
+        const response = JSON.parse(event.data)
+        if (response.code == 200) {
+          showSuccessAlert.value = true
+        } else {
+          showErrorAlert.value = true
+          console.error(response.message)
+          power.value = !power.value // 恢复原来的状态
+        }
+      }
+
+      ws.onerror = () => {
+        showConnectErrorAlert.value = true
+        console.error('WebSocket 连接失败')
+      }
+
+      ws.send(JSON.stringify(message))
+    }
+    /**
+     * @description: 开启空调
+     * @return {*}
+     */
     const turnOnAC = () => {
       const message = {
         targetTemperature: targetTemperature.value,
-        status: power.value ? fanSpeed.value : 0 // 若开启则返回风速大小，否则返回 0
+        status: fanSpeed.value
       }
+      sendRequest(`${baseURL}turnOn`, message)
+    }
+    /**
+     * @description: 关闭空调
+     * @return {*}
+     */
+    const turnOffAC = () => {
+      sendRequest(`${baseURL}turnOff`, {})
+    }
+    /**
+     * @description: 改变风速/目标温度
+     * @return {*}
+     */
+    const changeAC = () => {
+      const message = {
+        targetTemperature: targetTemperature.value,
+        status: fanSpeed.value
+      }
+
+      const ws = new WebSocket(`${baseURL}change`)
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data)
+        if (message.code == 200) {
+          showSuccessAlert.value = true
+        } else {
+          showErrorAlert.value = true
+          console.error(message.message)
+          targetTemperature.value = currentTemperature.value
+          fanSpeed.value = fanSpeed.value
+        }
+      }
+
+      ws.onerror = () => {
+        showConnectErrorAlert.value = true
+        console.error('WebSocket 连接失败')
+        targetTemperature.value = currentTemperature.value
+        fanSpeed.value = fanSpeed.value
+      }
+
       ws.send(JSON.stringify(message))
     }
 
+    /**
+     * @description: 获取空调状态
+     * @return {*}
+     */
+    const getACStatus = () => {
+      const ws = new WebSocket(`${baseURL}status`)
+
+      ws.onmessage = (event) => {
+        const response = JSON.parse(event.data)
+        if (response.code == 200) {
+          const data = response.data
+          if (data) {
+            power.value = data.status != null ? (data.status == 1) : power.value
+            currentTemperature.value = data.temperature != null ? data.temperature : currentTemperature.value
+            targetTemperature.value = data.targetTemp != null ? data.targetTemp : targetTemperature.value
+            fanSpeed.value = data.status != null ? data.status : fanSpeed.value
+            price.value = data.price != null ? data.price : price.value
+          }
+        } else {
+          showErrorAlert.value = true
+          console.error(response.message)
+        }
+      }
+
+      ws.onerror = () => {
+        showConnectErrorAlert.value = true
+        console.error('WebSocket 连接失败')
+      }
+    }
+
+    onMounted(() => {
+      getACStatus()
+    })
+    /**
+     * @description: 用户调整目标温度/风速
+     * @return {*}
+     */
     const increaseTemperature = () => {
+      changeAC()
       targetTemperature.value++
+
     }
 
     const decreaseTemperature = () => {
+      changeAC()
       targetTemperature.value--
     }
 
     const adjustFanSpeed = () => {
-      // 切换风速在 1、2、3 之间循环
+      changeAC()
       fanSpeed.value = fanSpeed.value < 3 ? fanSpeed.value + 1 : 1
+
     }
 
-    return { power, showAlert, currentTemperature, targetTemperature, fanSpeed, turnOnAC, increaseTemperature, decreaseTemperature, adjustFanSpeed }
+    return {
+      power,
+      showSuccessAlert,
+      showErrorAlert,
+      showConnectErrorAlert,
+      currentTemperature,
+      targetTemperature,
+      fanSpeed,
+      price,
+      handleSwitchChange,
+      increaseTemperature,
+      decreaseTemperature,
+      adjustFanSpeed
+    }
   }
 }
+
+
 </script>
 
 <style scoped>
@@ -158,8 +285,8 @@ export default {
 .floating-alert {
   position: fixed;
   margin: auto;
-  margin-top: 9%;
-  margin-left: 35%;
+  margin-top: 8%;
+  margin-left: 520px;
   width: 30%;
 }
 </style>
