@@ -30,6 +30,9 @@
 
 
 <script>
+
+import axios from 'axios';
+
 export default {
   name: 'UserLogin',
   data() {
@@ -54,6 +57,15 @@ export default {
         // 只是测试用
         localStorage.setItem('token', true);
         
+        axios.get('http://localhost:29010/api/customer/cool/watchAC')
+        .then(response => {
+          if(response.code == 200)
+            console.log("Login Successfully");
+          else
+            console.error(response.message);
+        }).catch(error=> {
+          console.error('Error:', error);
+        })
         this.$router.push('/home'); // 在登录成功后立即跳转
       } else {
         window.alert('账号或密码错误');
