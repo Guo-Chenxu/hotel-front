@@ -48,6 +48,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios';
 
+const baseURL = 'http://localhost:29010/api/customer/cool/';
 
 export default {
   name: 'UserCool',
@@ -61,7 +62,7 @@ export default {
     const fanSpeed = ref(null)
     const price = ref(null)
 
-    const baseURL = 'http://localhost:29010/api/customer/cool/';
+    
 
     const handleSwitchChange = () => {
       if (power.value) {
@@ -82,13 +83,13 @@ export default {
           } else {
             showErrorAlert.value = true;
             console.error(response.data.message);
-            power.value = !power.value; // 恢复原来的状态
+            power.value = !power.value; 
           }
         })
         .catch(error => {
           showConnectErrorAlert.value = true;
           console.error('HTTP 请求失败：', error.message || '未知错误');
-          power.value = !power.value; // 恢复原来的状态
+          power.value = !power.value; 
         });
     };
 
