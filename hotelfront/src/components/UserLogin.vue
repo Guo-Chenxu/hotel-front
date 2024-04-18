@@ -31,48 +31,50 @@
 
 <script>
 
-import axios from 'axios';
+const baseurl = 'http://localhost:29010/api/customer/customer/login';
 
 export default {
   name: 'UserLogin',
   data() {
     return {
-      username: '', // 将userid改为username以匹配后端的参数名
-      roomId: '', // 添加roomId字段
+      username: '', 
+      roomId: '', 
       isLoggedIn: false,
-      token: null // 添加token字段
+      token: null 
     }
   },
   created() {
     localStorage.clear();
   },
   methods: {
-    login() {
-      if (this.username == '1' && this.roomId == '1') {
-        // 设置token为一个随机字符串，模拟登录成功后后端返回的token
-        this.token = 'mocked_token';
-        // 标记用户为已登录状态
-        this.isLoggedIn = true;
-        // 将登录状态保存到本地存储中 
-        // 只是测试用
-        localStorage.setItem('token', true);
-        
-        axios.get('http://localhost:29010/api/customer/cool/watchAC')
-        .then(response => {
-          if(response.code == 200)
-            console.log("Login Successfully");
-          else
-            console.error(response.message);
-        }).catch(error=> {
-          console.error('Error:', error);
-        })
-        this.$router.push('/home'); // 在登录成功后立即跳转
-      } else {
-        window.alert('账号或密码错误');
+      login() {
+      if (this.username !== '' && this.roomId !== '') {
+        var self = this; 
+        fetch(`${baseurl}?name=${this.username}&room=${this.roomId}`, {
+          method: 'POST',
+          headers: {
+            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          if (!response.ok) {
+            throw new Error('网络错误');
+          }
+          return response.json();
+        }).then(function(data) {
+          if (data.code === 200) {
+            console.log('登录成功');
+            alert('登陆成功');
+            self.$router.push('/home');
+          } else {
+            console.error('登录失败:', data.message);
+          }
+        }).catch(function(error) {
+          console.error('登录失败:', error.message);
+        });
       }
-    },
+    }
   },
-
 }
 </script>
 
