@@ -36,7 +36,7 @@
           </div>
           <div slot="footer" class="dialog-footer">
             <el-button @click="closeRemarkDialog">取 消</el-button>
-            <el-button type="primary" @click="addRemark">确 定</el-button>
+            <el-button type="primary" @click="addMeal">确 定</el-button>
           </div>
         </el-dialog>
       </el-tab-pane>
@@ -78,6 +78,7 @@ export default {
       activeTab: 'tab1', 
       snacks: [], 
       currentPage: 1, 
+      page:1,
       pageSize: 10, 
       totalItems: 0, 
     };
@@ -109,41 +110,56 @@ export default {
       this.currentSnack = null;
       this.quantity = 1; 
     },
-    addRemark() {
-      const order = {
-        order: {
+    /**
+     * @description: 下单
+     * @return {*}
+     */    
+    addMeal() {
+      var data = JSON.stringify({
+        "order": {
           [this.currentSnack.id]: this.quantity
         },
-        remarks: this.currentSnack.remark
-      };
-      console.log(order);
-      axios.post(`${baseURL}order`, order)
-        .then(response => {
-          console.log(response);
-          if (response.code == 200) {
+        "remarks": this.currentSnack.remark
+      })
+      axios({
+        method: 'post',
+        url: `${baseURL}order`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: data
+      }).then(response => {
+          console.log(response.data);
+          if (response.data.code == 200) {
             this.closeRemarkDialog();
           } else {
-            console.error(response.message);
+            console.error(response.data.message);
           }
         })
         .catch(error => {
-          console.error("请求失败：", error.response.data.message || "未知错误");
+          console.error("请求失败：", error.message || "未知错误");
         });
     },
+    /**
+     * @description: 查询历史订单
+     * @return {*}
+     */    
     showHistoryOrders() {
-      axios.get(`${baseURL}history`)
-        .then(response => {
-          console.log(response);
-          if (response.code === 200) {
-            this.visibleOrders = response.data;
-            console.log("response.data:"+response.data)
+      axios({
+        method: 'get',
+        url: `${baseURL}history`,
+      }).then(response => {
+          console.log(response.data);
+          if (response.data.code === 200) {
+            this.visibleOrders = response.data.data
+            console.log("response.data:"+response.data.data)
           }
           else {
-            console.error(response.message);
+            console.error(response.data.message);
           }
         })
         .catch(error => {
-          console.error("请求失败：", error.response.data.message || "未知错误");
+          console.error("请求失败：", error.message || "未知错误");
         });
     },
     handleTabClick() {
@@ -154,23 +170,20 @@ export default {
       
     },
     showSnacks() {
-      axios.get(`${baseURL}page`, {
-        params: {
-          page: this.currentPage,
-          pageSize: this.pageSize
-        }
-      })
-        .then(response => {
-          console.log(response);
-          if (response.code === 200) {
-            this.snacks = response.data.records;
-            this.totalItems = response.data.total;
+      axios({
+        method: 'get',
+        url: `${baseURL}page?${this.page}&${this.pageSize}`
+      }).then(response => {
+          console.log(response.data);
+          if (response.data.code === 200) {
+            this.snacks = response.data.data.records;
+            this.totalItems = response.data.data.total;
           } else {
-            console.error(response.message);
+            console.error(response.data.message);
           }
         })
         .catch(error => {
-          console.error("请求失败：", error.response.data.message || "未知错误");
+          console.error("请求失败：", error.message || "未知错误");
         });
     },
     handleCurrentChange(page) {

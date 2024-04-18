@@ -11,11 +11,11 @@
           <form @submit.prevent="login" ref="loginForm">
             <div class="label-container">
               <label1 for="username" style="font-size: 25px;">房间号：</label1>
-              <input type="text" id="username" v-model="username" required>
+              <input type="text" id="username" v-model="roomId" required>
             </div>
             <div class="label-container">
               <label1 for="roomId" style="font-size: 25px;">用户名：</label1>
-              <input type="text" id="roomId" v-model="roomId" required>
+              <input type="text" id="roomId" v-model="username" required>
             </div>
             <h6 style="color: black">房间号1用户名1(以后删)</h6>
             <div class="login-button">
@@ -32,44 +32,57 @@
 <script>
 
 const baseurl = 'http://localhost:29010/api/customer/customer/login';
-
+import store from '../store';
 export default {
   name: 'UserLogin',
   data() {
     return {
-      username: '', 
-      roomId: '', 
+      username: '',
+      roomId: '',
       isLoggedIn: false,
-      token: null 
+      token: null
     }
   },
   created() {
     localStorage.clear();
   },
   methods: {
-      login() {
+    login() {
       if (this.username !== '' && this.roomId !== '') {
-        var self = this; 
+        var self = this;
         fetch(`${baseurl}?name=${this.username}&room=${this.roomId}`, {
           method: 'POST',
           headers: {
             'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
             'Content-Type': 'application/json'
           }
-        }).then(function(response) {
+        }).then(function (response) {
           if (!response.ok) {
             throw new Error('网络错误');
           }
           return response.json();
-        }).then(function(data) {
+        }).then(function (data) {
           if (data.code === 200) {
             console.log('登录成功');
             alert('登陆成功');
             self.$router.push('/home');
+            store.dispatch('updateUserId', self.username);
+            
+            
+            // 监控空调
+            fetch("http://localhost:29010/api/customer/cool/watchAC", {
+              method: 'GET',
+              redirect: 'follow'
+            }).then(console.log(response.data))
+              .catch(error => console.log('error', error));
+
           } else {
             console.error('登录失败:', data.message);
+            
+           
+            
           }
-        }).catch(function(error) {
+        }).catch(function (error) {
           console.error('登录失败:', error.message);
         });
       }

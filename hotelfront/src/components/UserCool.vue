@@ -45,9 +45,9 @@
 
 <script>
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios';
-
+import store from '../store';
 const baseURL = 'http://localhost:29010/api/customer/cool/';
 
 export default {
@@ -61,48 +61,91 @@ export default {
     const targetTemperature = ref(null)
     const fanSpeed = ref(null)
     const price = ref(null)
+    let ws;
 
-    
+    const initWebSocket = () => {
+      console.log(store.state.userId);
+      ws = new WebSocket(`ws://localhost:29010/api/customer/cool/watchAC/${store.state.userId}`);
+
+      ws.onopen = () => {
+        console.log('WebSocket 连接已建立');
+      };
+
+      ws.onmessage = (event) => {
+        const temperature = parseFloat(event.data).toFixed(2);
+        currentTemperature.value = temperature;
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket 连接已关闭');
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket 连接发生错误:', error);
+      };
+    };
+
+    const closeWebSocket = () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
 
     const handleSwitchChange = () => {
-      if (power.value) {
-        turnOnAC()
-      } else {
-        turnOffAC()
+      if (power.value !== null) {
+        if (power.value) {
+          if (power.value === true) {
+            turnOnAC()
+          }
+        } else {
+          if (power.value === false) {
+            turnOffAC()
+          }
+        }
       }
     }
 
+
     const turnOnAC = () => {
-      axios.post(`${baseURL}turnOn`, {
-        targetTemperature: targetTemperature.value,
-        status: fanSpeed.value
+      var data = JSON.stringify({
+        "targetTemperature": targetTemperature.value,
+        "status": fanSpeed.value
+      });
+      axios({
+        method: 'post',
+        url: `${baseURL}turnOn`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: data
+      }).then(response => {
+        if (response.data.code === 200) {
+          showSuccessAlert.value = true;
+        } else {
+          showErrorAlert.value = true;
+          console.error(response.data.message);
+          power.value = !power.value;
+        }
       })
-        .then(response => {
-          if (response.data.code === 200) {
-            showSuccessAlert.value = true;
-          } else {
-            showErrorAlert.value = true;
-            console.error(response.data.message);
-            power.value = !power.value; 
-          }
-        })
         .catch(error => {
           showConnectErrorAlert.value = true;
           console.error('HTTP 请求失败：', error.message || '未知错误');
-          power.value = !power.value; 
+          power.value = !power.value;
         });
     };
 
     const turnOffAC = () => {
-      axios.post(`${baseURL}turnOff`, {})
-        .then(response => {
-          if (response.data.code === 200) {
-            showSuccessAlert.value = true;
-          } else {
-            showErrorAlert.value = true;
-            console.error(response.data.message);
-          }
-        })
+      axios({
+        method: 'post',
+        url: `${baseURL}turnOff`,
+      }).then(response => {
+        if (response.data.code === 200) {
+          showSuccessAlert.value = true;
+        } else {
+          showErrorAlert.value = true;
+          console.error(response.data.message);
+        }
+      })
         .catch(error => {
           showConnectErrorAlert.value = true;
           console.error('HTTP 请求失败：', error.message || '未知错误');
@@ -110,20 +153,27 @@ export default {
     };
 
     const changeAC = () => {
-      axios.post(`${baseURL}change`, {
-        targetTemperature: targetTemperature.value,
-        status: fanSpeed.value
+      var data = JSON.stringify({
+        "targetTemperature": targetTemperature.value,
+        "status": fanSpeed.value
+      });
+      axios({
+        method: 'post',
+        url: `${baseURL}change`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: data
+      }).then(response => {
+        if (response.data.code === 200) {
+          showSuccessAlert.value = true;
+        } else {
+          showErrorAlert.value = true;
+          console.error(response.data.message);
+          targetTemperature.value = currentTemperature.value;
+          fanSpeed.value = fanSpeed.value;
+        }
       })
-        .then(response => {
-          if (response.data.code === 200) {
-            showSuccessAlert.value = true;
-          } else {
-            showErrorAlert.value = true;
-            console.error(response.data.message);
-            targetTemperature.value = currentTemperature.value;
-            fanSpeed.value = fanSpeed.value;
-          }
-        })
         .catch(error => {
           showConnectErrorAlert.value = true;
           console.error('HTTP 请求失败：', error.message || '未知错误');
@@ -134,31 +184,38 @@ export default {
 
     // 获取空调状态函数
     const getACStatus = () => {
-      axios.get(`${baseURL}status`)
-        .then(response => {
-          if (response.data.code === 200) {
-            const data = response.data.data;
-            if (data) {
-              power.value = data.status != null ? (data.status == 1) : power.value;
-              currentTemperature.value = data.temperature != null ? data.temperature : currentTemperature.value;
-              targetTemperature.value = data.targetTemp != null ? data.targetTemp : targetTemperature.value;
-              fanSpeed.value = data.status != null ? data.status : fanSpeed.value;
-              price.value = data.price != null ? data.price : price.value;
-            }
-          } else {
-            showErrorAlert.value = true;
-            console.error(response.data.message);
+      axios({
+        method: 'get',
+        url: `${baseURL}acStatus`,
+      }).then(response => {
+        if (response.data.code === 200) {
+          const data = response.data.data;
+          if (data) {
+            power.value = data.status != null ? (data.status == 1) : power.value;
+            currentTemperature.value = data.temperature != null ? data.temperature : currentTemperature.value;
+            targetTemperature.value = data.targetTemp != null ? data.targetTemp : targetTemperature.value;
+            fanSpeed.value = data.status != null ? data.status : fanSpeed.value;
+            price.value = data.price != null ? data.price : price.value;
           }
-        })
+        } else {
+          showErrorAlert.value = true;
+          console.error(response.data.message);
+        }
+      })
         .catch(error => {
           showConnectErrorAlert.value = true;
           console.error('HTTP 请求失败：', error.message || '未知错误');
         });
     };
 
-    
+
     onMounted(() => {
       getACStatus();
+      initWebSocket();
+    });
+
+    onBeforeUnmount(() => {
+      closeWebSocket();
     });
 
     /**
