@@ -7,8 +7,8 @@ import UserHome from '../components/UserHome.vue';
 
 const routes = [
   { path: '/', component: UserLogin },
-  { path: '/home', component: UserHome },
-  //{ path: '/home', component: UserHome, meta: { requiresAuth: true }  },
+  // { path: '/home', component: UserHome },
+  { path: '/home', component: UserHome, meta: { requiresAuth: true }  },
 ]
 
 const router = createRouter({
