@@ -31,7 +31,7 @@
 
 <script>
 
-const baseurl = 'http://localhost:29010/api/customer/customer/login';
+const baseurl = 'http://10.29.23.17/api/customer/customer/login';
 import store from '../store';
 export default {
   name: 'UserLogin',

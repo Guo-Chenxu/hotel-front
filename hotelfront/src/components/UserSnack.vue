@@ -172,7 +172,7 @@ export default {
     showSnacks() {
       axios({
         method: 'get',
-        url: `${baseURL}page?${this.page}&${this.pageSize}`
+        url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`
       }).then(response => {
           console.log(response.data);
           if (response.data.code === 200) {
