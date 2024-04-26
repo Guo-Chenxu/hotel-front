@@ -8,18 +8,14 @@
               <div>价格: {{ snack.price }}</div>
               <div>图片: <img :src="snack.img" style="max-width: 100px; max-height: 100px;" /></div>
             </div>
-    
+
             <div>
               <el-button type="primary" @click="showRemarkDialog(snack)">点餐</el-button>
             </div>
           </el-collapse-item>
         </el-collapse>
-        <el-pagination
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-size="pageSize"
-          layout="prev, pager, next"
-          :total="totalItems">
+        <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" 
+          layout="prev, pager, next" :total="50">
         </el-pagination>
         <el-dialog ref="remarkDialog" v-model="dialogVisible" title="订餐详情" @close="clearRemark">
           <p v-if="currentSnack">{{ currentSnack.name }}</p>
@@ -27,7 +23,7 @@
           <div class="input-wrapper">
             <label for="remark">备注: </label>
             <div class="flex-container">
-              <el-input  v-if="currentSnack" v-model="currentSnack.remark" id="remark" placeholder="添加备注"></el-input>
+              <el-input v-if="currentSnack" v-model="currentSnack.remark" id="remark" placeholder="添加备注"></el-input>
             </div>
           </div>
           <label for="quantity">订单数量:</label>
@@ -40,50 +36,57 @@
           </div>
         </el-dialog>
       </el-tab-pane>
-      <el-tab-pane label="查看历史订单" name="tab2" >
+      <el-tab-pane label="查看历史订单" name="tab2"  @tab-click="handleTabClick">
         <!-- 查看历史订单页面的内容 -->
         <div class="history">
           <ul class="infinite-list" style="overflow: auto;height:400px">
-            <li v-for="order in visibleOrders" :key="order.timestamp" class="infinite-list-item">
+            <li v-for="order in visibleOrders" class="infinite-list-item">
               <el-timeline style="max-width: 600px">
                 <el-timeline-item :timestamp="order.createAt" placement="top">
                   <el-card>
-                    <h4>订单编号：{{ order.id }}</h4>
-                    <p>顾客编号：{{ order.customerId }}</p>
+                    <p>用户姓名：{{ order.customerName }}</p>
+                    <div v-for="(food, index) in order.foods" :key="index">
+                      <p>食物：{{ food.name }}</p>
+                      <p>价格：{{ food.price }}</p>
+                      <p>图片: {{ food.img }}</p>
+                    </div>
                     <p>总价：{{ order.totalPrice }} 元</p>
                     <p>备注：{{ order.remarks }}</p>
-                    <p>创建时间：{{ order.createAt }}</p>
-                    <p>食物清单：</p>
-
                   </el-card>
                 </el-timeline-item>
               </el-timeline>
             </li>
           </ul>
         </div>
+        
       </el-tab-pane>
 
-      </el-tabs>
-    
+    </el-tabs>
+
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-const baseURL = 'http://localhost:29010/api/customer/food/';
+import store from '../store';
+const baseURL = 'http://10.29.23.17:29010/api/customer/food/';
 
 export default {
   data() {
     return {
-      activeTab: 'tab1', 
-      snacks: [], 
-      currentPage: 1, 
-      page:1,
-      pageSize: 10, 
-      totalItems: 0, 
+      activeTab: 'tab1',
+      snacks: [],
+      currentPage: 1,
+      page: 1,
+      pageSize: 10,
+      totalItems: 0,
+      dialogVisible: false,
+      visibleOrders:[],
+      activeName:'',
     };
   },
   mounted() {
+    
     this.showSnacks();
   },
   methods: {
@@ -97,7 +100,7 @@ export default {
     closeRemarkDialog() {
       this.dialogVisible = false;
       if (this.currentSnack !== null) {
-        
+
         setTimeout(() => {
           this.clearRemark();
         }, 0);
@@ -108,16 +111,17 @@ export default {
 
     clearRemark() {
       this.currentSnack = null;
-      this.quantity = 1; 
+      this.quantity = 1;
     },
     /**
      * @description: 下单
      * @return {*}
-     */    
+     */
     addMeal() {
+
       var data = JSON.stringify({
         "order": {
-          [this.currentSnack.id]: this.quantity
+          "key": this.currentSnack.id
         },
         "remarks": this.currentSnack.remark
       })
@@ -125,17 +129,18 @@ export default {
         method: 'post',
         url: `${baseURL}order`,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: store.getters.getToken // 获取存储的token
         },
         data: data
       }).then(response => {
-          console.log(response.data);
-          if (response.data.code == 200) {
-            this.closeRemarkDialog();
-          } else {
-            console.error(response.data.message);
-          }
-        })
+        console.log(response.data);
+        if (response.data.code == 200) {
+          this.closeRemarkDialog();
+        } else {
+          console.error(response.data.message);
+        }
+      })
         .catch(error => {
           console.error("请求失败：", error.message || "未知错误");
         });
@@ -143,51 +148,65 @@ export default {
     /**
      * @description: 查询历史订单
      * @return {*}
-     */    
+     */
     showHistoryOrders() {
+      console.log("token:"+store.getters.getToken);
       axios({
         method: 'get',
         url: `${baseURL}history`,
+        headers: {
+          Authorization: store.getters.getToken // 获取存储的token
+        }
       }).then(response => {
-          console.log(response.data);
-          if (response.data.code === 200) {
-            this.visibleOrders = response.data.data
-            console.log("response.data:"+response.data.data)
-          }
-          else {
-            console.error(response.data.message);
-          }
-        })
-        .catch(error => {
-          console.error("请求失败：", error.message || "未知错误");
-        });
+        console.log(response.data);
+        if (response.data.code === 200) {
+          // 遍历每个订单条目，提取出所需信息，并存储在visibleOrders中
+          this.visibleOrders = response.data.data.map(order => {
+            return {
+              customerName: order.customerName, // 用户姓名
+              foods: Object.values(order.foods), // 所有食物信息
+              totalPrice: order.totalPrice,
+              remarks: order.remarks,
+              createAt: order.createAt
+            };
+          });
+        } else {
+          console.error(response.data.message);
+        }
+      }).catch(error => {
+        console.error("请求失败：", error.message || "未知错误");
+      });
     },
+
     handleTabClick() {
-      if (this.activeTab === "tab1" ) {
-        
         this.showHistoryOrders();
-      }
-      
+
     },
     showSnacks() {
+      console.log("token:" + store.getters.getToken);
+      console.log("page"+ this.page)
       axios({
         method: 'get',
-        url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`
+        url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`,
+        headers: {
+          Authorization: store.getters.getToken
+        }
       }).then(response => {
-          console.log(response.data);
-          if (response.data.code === 200) {
-            this.snacks = response.data.data.records;
-            this.totalItems = response.data.data.total;
-          } else {
-            console.error(response.data.message);
-          }
-        })
+        console.log(response.data);
+        if (response.data.code === 200) {
+          this.snacks = response.data.data.records;
+          this.totalItems = response.data.data.total;
+        } else {
+          console.error(response.data.message);
+        }
+      })
         .catch(error => {
           console.error("请求失败：", error.message || "未知错误");
         });
     },
     handleCurrentChange(page) {
       this.currentPage = page;
+      this.page = page; // 设置当前页码
       this.showSnacks();
     },
 
@@ -198,7 +217,7 @@ export default {
 <style scoped>
 .customer-snack {
   width: 80%;
-  
+
   margin: 10% auto;
   margin-left: 150px;
 }

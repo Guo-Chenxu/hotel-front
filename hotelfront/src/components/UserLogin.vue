@@ -10,14 +10,13 @@
           <h1>欢迎入住！</h1>
           <form @submit.prevent="login" ref="loginForm">
             <div class="label-container">
-              <label1 for="username" style="font-size: 25px;">房间号：</label1>
+              <label for="roomId" style="font-size: 25px;">房间号：</label>
               <input type="text" id="username" v-model="roomId" required>
             </div>
             <div class="label-container">
-              <label1 for="roomId" style="font-size: 25px;">用户名：</label1>
+              <label for="username" style="font-size: 25px;">用户名：</label>
               <input type="text" id="roomId" v-model="username" required>
             </div>
-            <h6 style="color: black">房间号1用户名1(以后删)</h6>
             <div class="login-button">
               <button>登录</button>
             </div>
@@ -31,7 +30,8 @@
 
 <script>
 
-const baseurl = 'http://10.29.23.17/api/customer/customer/login';
+import axios from 'axios';
+const baseURL = 'http://10.29.23.17:29010/api/customer/customer/login';
 import store from '../store';
 export default {
   name: 'UserLogin',
@@ -49,42 +49,87 @@ export default {
   methods: {
     login() {
       if (this.username !== '' && this.roomId !== '') {
-        var self = this;
-        fetch(`${baseurl}?name=${this.username}&room=${this.roomId}`, {
-          method: 'POST',
-          headers: {
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
-            'Content-Type': 'application/json'
-          }
-        }).then(function (response) {
-          if (!response.ok) {
-            throw new Error('网络错误');
-          }
-          return response.json();
-        }).then(function (data) {
-          if (data.code === 200) {
-            console.log('登录成功');
-            alert('登陆成功');
-            self.$router.push('/home');
-            store.dispatch('updateUserId', self.username);
-            
-            
+        console.log(this.username)
+        console.log(this.roomId)
+        axios({
+          method: 'post',
+          url: `${baseURL}?name=${this.username}&room=${this.roomId}`,
+        }).then(response => {
+          if (response.data.code == 200) {
+            store.dispatch('updateToken', response.data.data.token);
+            store.dispatch('updateRoomId', this.roomId);
+            store.dispatch('updateUserId', this.username);
+            console.log('updateToken:'+response.data.data.token)
+            //console.log("data: " + response);
+            // localStorage.setItem('GlobalToken', response.data.data.token);
+            // console.log("data: " + response.data.data.token);
+            // //console.log(response.data.data.permission);
+            // this.GlobalPermission = response.data.data.permission;
+            // console.log("全局：" + this.GlobalPermission);
+            // localStorage.setItem('GlobalPermission', this.GlobalPermission);
+            // store.commit('setToken', data.token); // 保存 token 到 Vuex
+            this.$router.push('/home');
+
             // 监控空调
-            fetch("http://localhost:29010/api/customer/cool/watchAC", {
-              method: 'GET',
-              redirect: 'follow'
-            }).then(console.log(response.data))
-              .catch(error => console.log('error', error));
+            axios({
+              method: 'get',
+              url: 'http://10.29.23.17:29010/api/customer/cool/watchAC',
+              headers: {
+                Authorization: store.getters.getToken
+              },
+            }).then(response => {
+                if (response.data.code === 200) {
+                    console.log("watchAC success")
+                } else {
+                    console.error(response.data.message);
+                }
+            }).catch(error => {
+                console.error("请求失败：", error.message || "未知错误");
+            });
+
 
           } else {
-            console.error('登录失败:', data.message);
-            
-           
-            
+            console.error("error:" + response.data.message);
           }
-        }).catch(function (error) {
-          console.error('登录失败:', error.message);
+        }).catch(error => {
+          console.error("请求失败：", error.message || "未知错误");
         });
+        //   var self = this;
+        //   fetch(`${baseurl}?name=${this.username}&room=${this.roomId}`, {
+        //     method: 'POST',
+        //     headers: {
+        //       'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
+        //       'Content-Type': 'application/json'
+        //     }
+        //   }).then(function (response) {
+        //     if (!response.ok) {
+        //       throw new Error('网络错误');
+        //     }
+        //     return response.json();
+        //   }).then(function (data) {
+        //     if (data.code === 200) {
+        //       console.log('登录成功');
+        //       alert('登陆成功');
+        //       self.$router.push('/home');
+        //       store.dispatch('updateUserId', self.username);
+
+
+        //       // 监控空调
+        //       fetch("http://localhost:29010/api/customer/cool/watchAC", {
+        //         method: 'GET',
+        //         redirect: 'follow'
+        //       }).then(console.log(response.data))
+        //         .catch(error => console.log('error', error));
+
+        //     } else {
+        //       console.error('登录失败:', data.message);
+
+
+
+        //     }
+        //   }).catch(function (error) {
+        //     console.error('登录失败:', error.message);
+        //   });
       }
     }
   },
@@ -165,7 +210,7 @@ input {
   margin-bottom: 2vh;
 }
 
-label1 {
+label {
   color: #bdbdf3;
 }
 

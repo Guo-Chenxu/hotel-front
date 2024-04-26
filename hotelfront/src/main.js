@@ -3,13 +3,14 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
-import router from './router/index';
+import router from './router';
+import store from './store'
 
 const app = createApp(App);
 
 // 注册路由导航守卫
 router.beforeEach((to, from, next) => {
-    const isLoggedIn = localStorage.getItem('token');
+    const isLoggedIn =  store.getters.getToken;
 
     // 检查用户是否已登录
     if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -29,4 +30,5 @@ router.beforeEach((to, from, next) => {
 
 app.use(ElementPlus); 
 app.use(router);
+app.use(store);
 app.mount('#app'); 

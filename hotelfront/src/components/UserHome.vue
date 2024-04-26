@@ -26,16 +26,19 @@ import main from './UserMain.vue';
 import cool from './UserCool.vue';
 import snack from './UserSnack.vue';
 import login from './UserLogin.vue';
-
+import detail from './UserRoomDetail.vue';
+import bill from './UserBill.vue';
 export default {
     name: 'UserWindow',
     data() {
         return {
             sidebarItems: [
                 { name: '主页', component: 'main' },
+                { name: '房间详情', component: 'detail' },
                 { name: '纳凉服务', component: 'cool' },
                 { name: '进行点餐', component: 'snack' },
-                { name: '查看订单', component: 'login' }
+                { name: '账单', component: 'bill' },
+                
             ],
             currentPage: 0
         };
@@ -54,7 +57,9 @@ export default {
         main,
         cool,
         snack,
-        login
+        login,
+        detail,
+        bill
     }
 };
 </script>
@@ -63,7 +68,7 @@ export default {
 .user-window {
     width: 100%;
     height: 100%;
-    position:fixed;
+    
 }
 
 .header {

@@ -15,249 +15,206 @@
         <div class="status-display">
           <div class="led-row" style="margin-top: 0px;">
             <el-text>当前温度: </el-text>
-            <span class="led-digit temperature">{{ currentTemperature }}</span>
-            <span class="led-digit temperature">°C</span>
+            <div :key="updateKey"> <span>{{ currentTemperature }}</span> </div>
+
+            <span>°C</span>
           </div>
           <div class="led-row">
             <el-text>预期温度: </el-text>
-            <span class="led-digit temperature">{{ targetTemperature }}</span>
-            <span class="led-digit temperature">°C</span>
+            <el-input v-model="this.targetTemperature" style="width: 60px;" />
+            <span>°C</span>
           </div>
           <div class="led-row" style="margin-top: 40px;">
             <el-text style="margin-left: 10px;">风速</el-text>
-            <span class="subtext fan-speed" style="margin-right: 200px">{{ fanSpeed }}</span>
-            <el-text tag="b">空调{{ power ? '开启' : '关闭' }}</el-text>
+            <span class="subtext fan-speed" style="margin-right: 200px">{{ this.fanSpeed }}</span>
+            <el-text tag="b">空调状态:{{ this.power ? '开启' : '关闭' }}</el-text>
           </div>
         </div>
 
         <!-- 下半部分：调节按钮 -->
         <div class="control-buttons">
-          <el-switch v-model="power" inline-prompt active-text="ON" inactive-text="OFF" @change="handleSwitchChange" />
-          <el-button @click="increaseTemperature" :disabled="!power">+</el-button>
-          <el-button @click="decreaseTemperature" :disabled="!power">-</el-button>
-          <el-button @click="adjustFanSpeed" :disabled="!power">调节风速</el-button>
+          <el-switch v-model="this.power" inline-prompt active-text="ON" inactive-text="OFF"
+            @change="handleSwitchChange" />
+          <el-button @click="adjustFanSpeed">调节风速</el-button>
         </div>
       </el-card>
     </div>
-
   </div>
 </template>
 
 <script>
-
-import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios';
+const baseURL = 'http://10.29.23.17:29010/api/customer/cool/';
 import store from '../store';
-const baseURL = 'http://localhost:29010/api/customer/cool/';
-
+import { ref } from 'vue';
 export default {
   name: 'UserCool',
-  setup() {
-    const power = ref(null)
-    const showSuccessAlert = ref(false)
-    const showErrorAlert = ref(false)
-    const showConnectErrorAlert = ref(false)
-    const currentTemperature = ref(null)
-    const targetTemperature = ref(null)
-    const fanSpeed = ref(null)
-    const price = ref(null)
-    let ws;
+  methods: {
+    initWebSocket() {
 
-    const initWebSocket = () => {
-      console.log(store.state.userId);
-      ws = new WebSocket(`ws://localhost:29010/api/customer/cool/watchAC/${store.state.userId}`);
-
-      ws.onopen = () => {
+      this.ws = new WebSocket(`ws://10.29.23.17:29010/api/customer/cool/watchAC/${store.getters.getUserId}`);
+      this.ws.onopen = () => {
         console.log('WebSocket 连接已建立');
       };
-
-      ws.onmessage = (event) => {
+      this.ws.onmessage = (event) => {
         const temperature = parseFloat(event.data).toFixed(2);
-        currentTemperature.value = temperature;
+        this.currentTemperature = temperature;
+        this.$set(this, 'currentTemperature', temperature);
+        console.log(temperature)
       };
-
-      ws.onclose = () => {
+      this.ws.onclose = () => {
         console.log('WebSocket 连接已关闭');
       };
-
-      ws.onerror = (error) => {
+      this.ws.onerror = (error) => {
         console.error('WebSocket 连接发生错误:', error);
       };
-    };
-
-    const closeWebSocket = () => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close();
+    },
+    closeWebSocket() {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.close();
       }
-    };
-
-    const handleSwitchChange = () => {
-      if (power.value !== null) {
-        if (power.value) {
-          if (power.value === true) {
-            turnOnAC()
-          }
+    },
+    handleSwitchChange() {
+      if (this.power !== null) {
+        if (this.power) {
+          this.turnOnAC();
         } else {
-          if (power.value === false) {
-            turnOffAC()
-          }
+          this.turnOffAC();
         }
       }
-    }
-
-
-    const turnOnAC = () => {
+    },
+    turnOnAC() {
+      console.log("token:" + store.getters.getToken);
       var data = JSON.stringify({
-        "targetTemperature": targetTemperature.value,
-        "status": fanSpeed.value
+        "targetTemperature": this.targetTemperature,
+        "status": this.fanSpeed
       });
       axios({
         method: 'post',
         url: `${baseURL}turnOn`,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: store.getters.getToken
         },
         data: data
       }).then(response => {
         if (response.data.code === 200) {
-          showSuccessAlert.value = true;
+          this.showSuccessAlert = true;
+          console.log(response.data.message)
         } else {
-          showErrorAlert.value = true;
+          this.showErrorAlert = true;
           console.error(response.data.message);
-          power.value = !power.value;
+          this.power = !this.power;
         }
-      })
-        .catch(error => {
-          showConnectErrorAlert.value = true;
-          console.error('HTTP 请求失败：', error.message || '未知错误');
-          power.value = !power.value;
-        });
-    };
-
-    const turnOffAC = () => {
+      }).catch(error => {
+        console.error("请求失败：", error.message || "未知错误");
+      });
+    },
+    turnOffAC() {
+      console.log("token:" + store.getters.getToken);
       axios({
         method: 'post',
         url: `${baseURL}turnOff`,
+        headers: {
+
+          Authorization: store.getters.getToken
+        },
       }).then(response => {
         if (response.data.code === 200) {
-          showSuccessAlert.value = true;
+          this.showSuccessAlert = true;
+          console.log(response.data.message)
         } else {
-          showErrorAlert.value = true;
+          this.showErrorAlert = true;
           console.error(response.data.message);
         }
-      })
-        .catch(error => {
-          showConnectErrorAlert.value = true;
-          console.error('HTTP 请求失败：', error.message || '未知错误');
-        });
-    };
-
-    const changeAC = () => {
-      var data = JSON.stringify({
-        "targetTemperature": targetTemperature.value,
-        "status": fanSpeed.value
+      }).catch(error => {
+        this.showConnectErrorAlert = true;
+        console.error('HTTP 请求失败：', error.message || '未知错误');
       });
+    },
+    changeAC() {
+
+      var data = JSON.stringify({
+        "targetTemperature": this.targetTemperature,
+        "status": this.fanSpeed
+      });
+
       axios({
         method: 'post',
         url: `${baseURL}change`,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: store.getters.getToken
         },
         data: data
       }).then(response => {
         if (response.data.code === 200) {
-          showSuccessAlert.value = true;
+          this.showSuccessAlert = true;
+          console.log(response.data.message)
         } else {
-          showErrorAlert.value = true;
+          this.showErrorAlert = true;
           console.error(response.data.message);
-          targetTemperature.value = currentTemperature.value;
-          fanSpeed.value = fanSpeed.value;
         }
-      })
-        .catch(error => {
-          showConnectErrorAlert.value = true;
-          console.error('HTTP 请求失败：', error.message || '未知错误');
-          targetTemperature.value = currentTemperature.value;
-          fanSpeed.value = fanSpeed.value;
-        });
-    };
-
-    // 获取空调状态函数
-    const getACStatus = () => {
+      }).catch(error => {
+        console.error("请求失败：", error.message || "未知错误");
+      });
+    },
+    getACStatus() {
       axios({
         method: 'get',
         url: `${baseURL}acStatus`,
+        headers: {
+          Authorization: store.getters.getToken
+        },
       }).then(response => {
         if (response.data.code === 200) {
+          console.log(response.data.data)
           const data = response.data.data;
           if (data) {
-            power.value = data.status != null ? (data.status == 1) : power.value;
-            currentTemperature.value = data.temperature != null ? data.temperature : currentTemperature.value;
-            targetTemperature.value = data.targetTemp != null ? data.targetTemp : targetTemperature.value;
-            fanSpeed.value = data.status != null ? data.status : fanSpeed.value;
-            price.value = data.price != null ? data.price : price.value;
+            this.power = data.status != 0 ? (true) : false;
+            this.currentTemperature = data.temperature.toFixed(2);
+            this.targetTemperature = data.targetTemp.toFixed(2);
+            this.fanSpeed = data.status;
+            this.price = data.price;
           }
         } else {
-          showErrorAlert.value = true;
+          this.showErrorAlert = true;
           console.error(response.data.message);
         }
-      })
-        .catch(error => {
-          showConnectErrorAlert.value = true;
-          console.error('HTTP 请求失败：', error.message || '未知错误');
-        });
-    };
-
-
-    onMounted(() => {
-      getACStatus();
-      initWebSocket();
-    });
-
-    onBeforeUnmount(() => {
-      closeWebSocket();
-    });
-
-    /**
-     * @description: 用户调整目标温度/风速
-     * @return {*}
-     */
-    const increaseTemperature = () => {
-      changeAC()
-      targetTemperature.value++
-
+      }).catch(error => {
+        this.showConnectErrorAlert = true;
+        console.error('HTTP 请求失败：', error.message || '未知错误');
+      });
+    },
+    
+    adjustFanSpeed() {
+      this.fanSpeed = this.fanSpeed < 3 ? this.fanSpeed + 1 : 1;
+      this.changeAC();
     }
-
-    const decreaseTemperature = () => {
-      changeAC()
-      targetTemperature.value--
-    }
-
-    const adjustFanSpeed = () => {
-      changeAC()
-      fanSpeed.value = fanSpeed.value < 3 ? fanSpeed.value + 1 : 1
-
-    }
-
+  },
+  data() {
     return {
-      power,
-      showSuccessAlert,
-      showErrorAlert,
-      showConnectErrorAlert,
-      currentTemperature,
-      targetTemperature,
-      fanSpeed,
-      price,
-      handleSwitchChange,
-      increaseTemperature,
-      decreaseTemperature,
-      adjustFanSpeed,
-      getACStatus
+      power: false,
+      showSuccessAlert: false,
+      showErrorAlert: false,
+      showConnectErrorAlert: false,
+      currentTemperature: ref(''),
+      targetTemperature: '24',
+      
+      fanSpeed: '',
+      price: '',
+      ws: ''
     }
+  },
+  mounted() {
+    this.getACStatus()
+    this.initWebSocket()
+  },
+  beforeUnmount() {
+    this.closeWebSocket()
   }
+
 }
-
-
 </script>
 
 <style scoped>
