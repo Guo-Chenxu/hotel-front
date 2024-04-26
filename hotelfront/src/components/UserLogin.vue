@@ -43,9 +43,6 @@ export default {
       token: null
     }
   },
-  created() {
-    localStorage.clear();
-  },
   methods: {
     login() {
       if (this.username !== '' && this.roomId !== '') {
