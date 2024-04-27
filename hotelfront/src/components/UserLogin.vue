@@ -32,7 +32,7 @@
 
 import axios from 'axios';
 const baseURL = 'http://10.29.23.17:29010/api/customer/customer/login';
-import store from '../store';
+
 export default {
   name: 'UserLogin',
   data() {
@@ -53,17 +53,9 @@ export default {
           url: `${baseURL}?name=${this.username}&room=${this.roomId}`,
         }).then(response => {
           if (response.data.code == 200) {
-            store.dispatch('updateToken', response.data.data.token);
-            store.dispatch('updateRoomId', response.data.data.room);
-            store.dispatch('updateUserId', response.data.data.customerId);
-            //console.log("data: " + response);
-            // localStorage.setItem('GlobalToken', response.data.data.token);
-            // console.log("data: " + response.data.data.token);
-            // //console.log(response.data.data.permission);
-            // this.GlobalPermission = response.data.data.permission;
-            // console.log("全局：" + this.GlobalPermission);
-            // localStorage.setItem('GlobalPermission', this.GlobalPermission);
-            // store.commit('setToken', data.token); // 保存 token 到 Vuex
+            localStorage.setItem('token', response.data.data.token);
+            localStorage.setItem('roomId', response.data.data.room);
+            localStorage.setItem('userId', response.data.data.customerId);
             this.$router.push('/home');
 
             // 监控空调
@@ -71,7 +63,7 @@ export default {
               method: 'get',
               url: 'http://10.29.23.17:29010/api/customer/cool/watchAC',
               headers: {
-                Authorization: store.getters.getToken
+                Authorization: localStorage.getItem('token')
               },
             }).then(response => {
                 if (response.data.code === 200) {
@@ -90,42 +82,6 @@ export default {
         }).catch(error => {
           console.error("请求失败：", error.message || "未知错误");
         });
-        //   var self = this;
-        //   fetch(`${baseurl}?name=${this.username}&room=${this.roomId}`, {
-        //     method: 'POST',
-        //     headers: {
-        //       'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
-        //       'Content-Type': 'application/json'
-        //     }
-        //   }).then(function (response) {
-        //     if (!response.ok) {
-        //       throw new Error('网络错误');
-        //     }
-        //     return response.json();
-        //   }).then(function (data) {
-        //     if (data.code === 200) {
-        //       console.log('登录成功');
-        //       alert('登陆成功');
-        //       self.$router.push('/home');
-        //       store.dispatch('updateUserId', self.username);
-
-
-        //       // 监控空调
-        //       fetch("http://localhost:29010/api/customer/cool/watchAC", {
-        //         method: 'GET',
-        //         redirect: 'follow'
-        //       }).then(console.log(response.data))
-        //         .catch(error => console.log('error', error));
-
-        //     } else {
-        //       console.error('登录失败:', data.message);
-
-
-
-        //     }
-        //   }).catch(function (error) {
-        //     console.error('登录失败:', error.message);
-        //   });
       }
     }
   },

@@ -122,7 +122,6 @@
 <script>
 
 import axios from 'axios'
-import store from '../store';
 const baseURL = 'http://10.29.23.17:29010/api/customer/bill';
 import * as echarts from 'echarts';
 
@@ -151,7 +150,7 @@ export default {
         this.fetchBill();
     },
     watch: {
-        detailTab(newTab, oldTab) {
+        detailTab(newTab) {
             // 根据选中的详单标签页调用不同的方法
             switch (newTab) {
                 case 'accommodation':
@@ -182,7 +181,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/bill`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
             }).then(response => {
                 if (response.data.code === 200) {
@@ -202,7 +201,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/billStatement?type=${1}`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
             }).then(response => {
                 console.log(response.data.data)
@@ -221,7 +220,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/billStatement?type=${3}`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
             }).then(response => {
                 console.log(response.data.data)
@@ -266,7 +265,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/billStatement?type=${2}`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
             }).then(response => {
                 console.log(response.data.data)
@@ -337,7 +336,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/downloadBill`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
                 responseType: 'blob'
             }).then(response => {
@@ -366,7 +365,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/downloadBillStatement?type=${1}`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
                 responseType: 'blob'
             }).then(response => {
@@ -392,7 +391,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/downloadBillStatement?type=${3}`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
                 responseType: 'blob'
             }).then(response => {
@@ -419,7 +418,7 @@ export default {
                 method: 'get',
                 url: `${baseURL}/downloadBillStatement?type=${2}`,
                 headers: {
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
                 responseType: 'blob'
 

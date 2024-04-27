@@ -16,7 +16,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../store';
+
 export default {
 
     data() {
@@ -36,13 +36,13 @@ export default {
     },
     methods: {
         fetchRoomDetails() {
-            console.log("userID"+ store.state.roomId)
+            
             axios({
                 method: 'get',
-                url: `http://10.29.23.17:29010/api/customer/room/info/${store.state.roomId}`,
+                url: `http://10.29.23.17:29010/api/customer/room/info/${localStorage.getItem('roomId')}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: store.getters.getToken
+                    Authorization: localStorage.getItem('token')
                 },
             }).then(response => {
                 if (response.data.code === 200) {

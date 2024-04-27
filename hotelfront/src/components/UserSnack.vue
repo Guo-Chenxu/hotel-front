@@ -68,7 +68,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../store';
+
 const baseURL = 'http://10.29.23.17:29010/api/customer/food/';
 
 export default {
@@ -124,7 +124,7 @@ export default {
         url: `${baseURL}order`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: store.getters.getToken // 获取存储的token
+          Authorization: localStorage.getItem('token') // 获取存储的token
         },
         data: data
       }).then(response => {
@@ -143,48 +143,48 @@ export default {
      * @description: 查询历史订单
      * @return {*}
      */
-     showHistoryOrders() {
-  console.log("token:" + store.getters.getToken);
-  axios({
-    method: 'get',
-    url: `${baseURL}history`,
-    headers: {
-      Authorization: store.getters.getToken // 获取存储的token
-    }
-  }).then(response => {
-    console.log(response.data);
-    if (response.data.code === 200) {
-      // 遍历每个订单条目，提取出所需信息，并存储在visibleOrders中
-      this.visibleOrders = response.data.data.map(order => {
-        const foods = [];
-        for (const key in order.foods) {
-          if (order.foods.hasOwnProperty(key)) {
-            // 提取食物信息字符串中的各个属性值
-            const [, id, name, price, img] = key.match(/id=(.*?), name=(.*?), price=(.*?), img=(.*?), deleted=(.*?)\)$/);
-            foods.push({
-              id: id,
-              name: name,
-              price: price,
-              img: img,
-              quantity: order.foods[key]
-            });
-          }
+    showHistoryOrders() {
+      console.log("token:" + localStorage.getItem('token'));
+      axios({
+        method: 'get',
+        url: `${baseURL}history`,
+        headers: {
+          Authorization: localStorage.getItem('token') // 获取存储的token
         }
-        return {
-          customerName: order.customerName, // 用户姓名
-          foods: foods, // 所有食物信息
-          totalPrice: order.totalPrice,
-          remarks: order.remarks,
-          createAt: order.createAt
-        };
+      }).then(response => {
+        console.log(response.data);
+        if (response.data.code === 200) {
+          // 遍历每个订单条目，提取出所需信息，并存储在visibleOrders中
+          this.visibleOrders = response.data.data.map(order => {
+            const foods = [];
+            for (const key in order.foods) {
+              if (order.foods.hasOwnProperty(key)) {
+                // 提取食物信息字符串中的各个属性值
+                const [, id, name, price, img] = key.match(/id=(.*?), name=(.*?), price=(.*?), img=(.*?), deleted=(.*?)\)$/);
+                foods.push({
+                  id: id,
+                  name: name,
+                  price: price,
+                  img: img,
+                  quantity: order.foods[key]
+                });
+              }
+            }
+            return {
+              customerName: order.customerName, // 用户姓名
+              foods: foods, // 所有食物信息
+              totalPrice: order.totalPrice,
+              remarks: order.remarks,
+              createAt: order.createAt
+            };
+          });
+        } else {
+          console.error(response.data.message);
+        }
+      }).catch(error => {
+        console.error("请求失败：", error.message || "未知错误");
       });
-    } else {
-      console.error(response.data.message);
-    }
-  }).catch(error => {
-    console.error("请求失败：", error.message || "未知错误");
-  });
-},
+    },
 
 
 
@@ -195,13 +195,13 @@ export default {
 
     },
     showSnacks() {
-      console.log("token:" + store.getters.getToken);
+      console.log("token:" + localStorage.getItem('token'));
       console.log("page" + this.page)
       axios({
         method: 'get',
         url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`,
         headers: {
-          Authorization: store.getters.getToken
+          Authorization: localStorage.getItem('token')
         }
       }).then(response => {
         console.log(response.data);

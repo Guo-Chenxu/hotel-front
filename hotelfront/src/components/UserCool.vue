@@ -30,7 +30,7 @@
         <!-- 下半部分：调节按钮 -->
         <div class="control-buttons">
           <el-button @click="turn">开/关</el-button>
-          <el-button @click="fresh">刷新</el-button>
+          
           <el-button @click="adjustFanSpeed">调节风速</el-button>
         </div>
 
@@ -44,11 +44,12 @@
 <script>
 import axios from 'axios';
 const baseURL = 'http://10.29.23.17:29010/api/customer/cool';
-const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${store.getters.getUserId}`
-import store from '../store';
+const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${localStorage.getItem('userId')}`
+
 export default {
   data() {
     return {
+      
       currentTemperature: '',
       targetTemperature: 25,
       status: '',
@@ -57,20 +58,12 @@ export default {
     }
   },
   mounted() {
-    
+
     this.setupWebSocket(); // 设置WebSocket监听数据变化
   },
-  created() {
-    // 监听数据变化
-    this.$watch(() => [this.currentTemperature], () => {
-      console.log("watching");
-      this.fetchData(); // 数据变化时重新获取数据
-    }, { deep: true });
-  },
+
   methods: {
-    fresh(){
-      this.fetchData(); // 页面加载时请求数据
-    },
+
     setupWebSocket() {
       const ws = new WebSocket(wsURL);
 
@@ -79,9 +72,9 @@ export default {
       };
 
       ws.onmessage = (event) => {
-        console.log('Received message:', event.data); // 打印消息到控制台
+        
         const data = JSON.parse(event.data);
-        this.currentTemperature = data;
+        this.currentTemperature = data.toFixed(2);
 
       };
 
@@ -98,7 +91,7 @@ export default {
         method: 'get',
         url: `${baseURL}/acStatus`,
         headers: {
-          Authorization: store.getters.getToken
+          Authorization: localStorage.getItem('token')
         },
       }).then(response => {
         if (response.data.code === 200) {
@@ -146,7 +139,7 @@ export default {
         url: `${baseURL}/change`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: store.getters.getToken
+          Authorization: localStorage.getItem('token')
         },
         data: data
       }).then(response => {
@@ -184,7 +177,7 @@ export default {
         url: `${baseURL}/turnOn`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: store.getters.getToken
+          Authorization: localStorage.getItem('token')
         },
         data: data
       }).then(response => {
@@ -207,7 +200,7 @@ export default {
         method: 'post',
         url: `${baseURL}/turnOff`,
         headers: {
-          Authorization: store.getters.getToken
+          Authorization: localStorage.getItem('token')
         },
       }).then(response => {
         if (response.data.code === 200) {
