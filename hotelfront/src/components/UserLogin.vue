@@ -54,9 +54,8 @@ export default {
         }).then(response => {
           if (response.data.code == 200) {
             store.dispatch('updateToken', response.data.data.token);
-            store.dispatch('updateRoomId', this.roomId);
-            store.dispatch('updateUserId', this.username);
-            console.log('updateToken:'+response.data.data.token)
+            store.dispatch('updateRoomId', response.data.data.room);
+            store.dispatch('updateUserId', response.data.data.customerId);
             //console.log("data: " + response);
             // localStorage.setItem('GlobalToken', response.data.data.token);
             // console.log("data: " + response.data.data.token);
