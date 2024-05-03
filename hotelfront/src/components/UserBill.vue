@@ -2,8 +2,11 @@
     <div class="container">
         <el-tabs v-model="activeTab" type="border-card">
             <el-tab-pane label="消费图表" name="chart">
-                <div id="pieChart" style="width: 100%; height: 400px;"></div>
-            </el-tab-pane>
+                <div class="chart-container">
+                  <div id="pieChart"></div>
+                </div>
+              </el-tab-pane>
+              
             <el-tab-pane label="账单" name="summary">
                 <el-card class="control-panel" shadow="always">
                     <template #header>
@@ -454,4 +457,16 @@ export default {
     width: 80%;
     margin: auto;
 }
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh; 
+  }
+  
+  #pieChart {
+    width: 80%; 
+    max-width: 1000px;
+    height: 100%;
+  }
 </style>

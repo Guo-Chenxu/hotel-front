@@ -29,10 +29,8 @@
 
 
 <script>
-
 import axios from 'axios';
 const baseURL = 'http://10.29.23.17:29010/api/customer/customer/login';
-
 export default {
   name: 'UserLogin',
   data() {
@@ -40,14 +38,13 @@ export default {
       username: '',
       roomId: '',
       isLoggedIn: false,
-      token: null
+      token: null,
+      ws: null // WebSocket instance
     }
   },
   methods: {
     login() {
       if (this.username !== '' && this.roomId !== '') {
-        console.log(this.username)
-        console.log(this.roomId)
         axios({
           method: 'post',
           url: `${baseURL}?name=${this.username}&room=${this.roomId}`,
@@ -57,7 +54,7 @@ export default {
             localStorage.setItem('roomId', response.data.data.room);
             localStorage.setItem('userId', response.data.data.customerId);
             this.$router.push('/home');
-
+            
             // 监控空调
             axios({
               method: 'get',
@@ -66,16 +63,15 @@ export default {
                 Authorization: localStorage.getItem('token')
               },
             }).then(response => {
-                if (response.data.code === 200) {
-                    console.log("watchAC success")
-                } else {
-                    console.error(response.data.message);
-                }
+              if (response.data.code === 200) {
+                console.log("watchAC success")
+              } else {
+                console.error(response.data.message);
+              }
             }).catch(error => {
-                console.error("请求失败：", error.message || "未知错误");
+              console.error("请求失败：", error.message || "未知错误");
             });
-
-
+            this.initWebSocket();
           } else {
             console.error("error:" + response.data.message);
           }
@@ -83,11 +79,31 @@ export default {
           console.error("请求失败：", error.message || "未知错误");
         });
       }
-    }
+    },
+    initWebSocket() {
+      const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
+      
+      this.ws = new WebSocket(wsURL);
+      
+      this.ws.onopen = () => {
+        console.log('WebSocket connected');
+      };
+
+      this.ws.onmessage = (event) => {
+        localStorage.setItem('cool', event.data);
+      };
+
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      this.ws.onclose = () => {
+        console.log('WebSocket closed');
+      };
+    },
   },
 }
 </script>
-
 
 <style scoped>
 .user-login {

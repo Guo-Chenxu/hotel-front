@@ -15,7 +15,7 @@
           </el-collapse-item>
         </el-collapse>
         <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next"
-          :total="50">
+          :total= this.totalItems>
         </el-pagination>
         <el-dialog ref="remarkDialog" v-model="dialogVisible" title="订餐详情">
           <p v-if="currentSnack">{{ currentSnack.name }}</p>
@@ -130,7 +130,7 @@ export default {
       }).then(response => {
         console.log(response.data);
         if (response.data.code == 200) {
-          console.log("111")
+          this.dialogVisible = false;
         } else {
           console.error(response.data.message);
         }
@@ -195,8 +195,7 @@ export default {
 
     },
     showSnacks() {
-      console.log("token:" + localStorage.getItem('token'));
-      console.log("page" + this.page)
+      
       axios({
         method: 'get',
         url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`,

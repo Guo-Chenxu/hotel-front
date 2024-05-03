@@ -1,138 +1,235 @@
 <template>
   <div class="air-conditioner-service">
-    <div class="content">
-      <el-card class="control-panel" shadow="always">
-        <template #header>
-          <div class="card-header">
-            <span>空调控制面板</span>
-          </div>
-        </template>
-        <!-- 上半部分：温度、风速、空调状态 -->
-        <div class="status-display">
-          <div class="led-row">
-            <el-text>当前温度: </el-text>
-            <span>{{ this.currentTemperature }}</span>
-            <span>°C</span>
-          </div>
-          <div class="led-row">
-            <el-text>预期温度: </el-text>
-            <el-input v-model="this.targetTemperature" style="width: 60px;" />
-            <span>°C</span>
-          </div>
-          <div class="led-row">
-            <el-text tag="b">空调状态: {{ this.statusText }}</el-text>
-          </div>
-          <div class="led-row">
-            <el-text style="margin-left: 10px;">风速:{{ this.fanSpeed }}</el-text>
-          </div>
+    <el-tabs v-model="activeTab" @tab-click="handleTabClick">
+      <el-tab-pane label="调节空调" name="tab1">
+        <div class="content">
+          <el-card class="control-panel" shadow="always">
+            <template #header>
+              <div class="card-header">
+                <span>空调控制面板</span>
+              </div>
+            </template>
+            <!-- 上半部分：温度、风速、空调状态 -->
+            <div class="status-display">
+              <div class="led-row">
+                <el-text>当前温度: </el-text>
+                <span>{{ currentTemperature }}</span>
+                <span>°C</span>
+              </div>
+              <div class="led-row">
+                <el-text>预期温度: </el-text>
+                <el-input v-model="targetTemperatureValue" style="width: 60px;" @change="changeAC" />
+                <span>°C</span>
+              </div>
+              <div class="led-row">
+                <el-text>空调状态: {{ statusText }}</el-text>
+              </div>
+              <div class="led-row">
+                <el-text>风速: {{ fanSpeed }}</el-text>
+              </div>
+              <div class="led-row">
+                <el-text>空调每分钟变化温度: {{ changeTmp }}</el-text>
+              </div>
+              <div class="led-row">
+                <el-text>当前价格: {{ price }}</el-text>
+              </div>
+
+            </div>
+            <!-- 下半部分：调节按钮 -->
+            <div class="control-buttons">
+              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn">{{ this.status == 0 ? '开启' : '关闭'
+                }}</el-button>
+              <el-button @click="adjustFanSpeed">调节风速</el-button>
+            </div>
+
+          </el-card>
 
         </div>
-        <!-- 下半部分：调节按钮 -->
-        <div class="control-buttons">
-          <el-button @click="turn">开/关</el-button>
-          
-          <el-button @click="adjustFanSpeed">调节风速</el-button>
-        </div>
+      </el-tab-pane>
+      <el-tab-pane label="查看空调参数" name="tab2">
+        <el-table :data="tableData" style="width: 100%;margin-left:30%;margin-top:10%">
+          <el-table-column prop="parameter" label="参数" width="200"></el-table-column>
+          <el-table-column prop="value" label="值" width="200"></el-table-column>
+          <el-table-column align="right">
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+    </el-tabs>
 
-      </el-card>
-
-    </div>
   </div>
 </template>
 
-
 <script>
+
 import axios from 'axios';
 const baseURL = 'http://10.29.23.17:29010/api/customer/cool';
-const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${localStorage.getItem('userId')}`
+
 
 export default {
   data() {
     return {
-      
+      activeTab: 'tab1',
       currentTemperature: '',
-      targetTemperature: 25,
+      changeTmp: '',
+      targetTemperatureValue: 25,
       status: '',
       fanSpeed: 1,
-      statusText:'',
+      price: '',
+      statusText: '',
+      airConditioningProperties: {
+
+        count: '',
+        upperBoundTemperature: '',
+        lowerBoundTemperature: '',
+        defaultTargetTemp: '',
+        defaultStatus: '',
+        high: {
+          changeTemperature: '',
+          price: ""
+        },
+        middle: {
+          changeTemperature: '',
+          price: ""
+        },
+        low: {
+          changeTemperature: '',
+          price: ""
+        }
+      },
     }
   },
+
   mounted() {
-
-    this.setupWebSocket(); // 设置WebSocket监听数据变化
+    this.fetchData();
+    // 监听数据变化
+    // this.$watch(() => [this.currentTemperature], () => {
+    //   console.log("watching");
+    //   this.fetchData(); // 数据变化时重新获取数据
+    // }, { deep: true });
   },
-
-  methods: {
-
-    setupWebSocket() {
-      const ws = new WebSocket(wsURL);
-
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-      };
-
-      ws.onmessage = (event) => {
-        
-        const data = JSON.parse(event.data);
-        this.currentTemperature = data.toFixed(2);
-
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket closed');
-      };
+  computed: {
+    tableData() {
+      return [
+        { parameter: '空调台数', value: this.airConditioningProperties.count },
+        { parameter: '上限温度', value: this.airConditioningProperties.upperBoundTemperature + '℃' },
+        { parameter: '下限温度', value: this.airConditioningProperties.lowerBoundTemperature + '℃' },
+        { parameter: '默认空调目标温度', value: this.airConditioningProperties.defaultTargetTemp + '℃' },
+        {
+          parameter: '默认空调档位',
+          value: this.getGearName(this.airConditioningProperties.defaultStatus)
+        },
+        {
+          parameter: '高档变化温度',
+          value: this.airConditioningProperties.high.changeTemperature + '℃/分钟，价格：' + this.airConditioningProperties.high.price + '元/分钟'
+        },
+        {
+          parameter: '中档变化温度',
+          value: this.airConditioningProperties.middle.changeTemperature + '℃/分钟，价格：' + this.airConditioningProperties.middle.price + '元/分钟'
+        },
+        {
+          parameter: '低档变化温度',
+          value: this.airConditioningProperties.low.changeTemperature + '℃/分钟，价格：' + this.airConditioningProperties.low.price + '元/分钟'
+        }
+      ];
     },
-    fetchData() {
+    paginatedRoomStatus() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.roomCoolRecords.slice(start, end);
+    }
+  },
+  methods: {
+    handleTabClick() {
+      this.showCoolData();
+    },
+    getGearName(gear) {
+      switch (gear) {
+        case 1:
+          return '低档';
+        case 2:
+          return '中档';
+        case 3:
+          return '高档';
+        default:
+          return '未知';
+      }
+    },
+    showCoolData() {
       axios({
         method: 'get',
-        url: `${baseURL}/acStatus`,
+        url: `${baseURL}/properties`,
         headers: {
           Authorization: localStorage.getItem('token')
-        },
+        }
       }).then(response => {
         if (response.data.code === 200) {
-          console.log(response.data.data)
-          var data = response.data.data;
-          if (data.status == 0) {
-            this.fanSpeed = 0;
-            this.statusText = "关闭";
-          } else if (data.status == 1) {
-            this.fanSpeed = 1;
-            this.statusText = "低速";
-          } else if (data.status == 2) {
-            this.fanSpeed = 2;
-            this.statusText = "中速";
-          } else if (data.status == 3) {
-            this.fanSpeed = 3;
-            this.statusText = "高速";
-          } else if (data.status == 4) {
-            this.fanSpeed = 0;
-            this.statusText = "等待";
-          }
-          this.status = data.status;
-          console.log("this.fanSpeed: " + this.fanSpeed);
-          console.log("this.status: " + this.status);
-          this.currentTemperature = data.temperature.toFixed(2); 
-          this.targetTemperature = data.targetTemp.toFixed(2); 
-
+          this.airConditioningProperties = response.data.data
+          console.log("获取空调属性成功");
         } else {
-          this.showErrorAlert = true;
           console.error(response.data.message);
         }
-      }).catch(error => {
-        this.showConnectErrorAlert = true;
-        console.error('HTTP 请求失败：', error.message || '未知错误');
-      });
+      })
+        .catch(error => {
+          console.error('获取空调属性失败:', error);
+        });
+    },
+    fetchData() {
+      // axios({
+      //   method: 'get',
+      //   url: `${baseURL}/acStatus`,
+      //   headers: {
+      //     Authorization: localStorage.getItem('token')
+      //   },
+      // }).then(response => {
+      //   if (response.data.code === 200) {
+      //     console.log(response.data.data)
+      var coolData = localStorage.getItem("cool");
+      if (coolData) {
+        //var data = response.data.data;
+
+        coolData = JSON.parse(coolData);
+        this.updateACStatus(coolData);
+        console.log(coolData)
+        this.changeTmp = coolData.changeTemp != null ? coolData.changeTemp : '';
+        this.currentTemperature = coolData.temperature != null ? coolData.temperature.toFixed(2) : '';
+        this.targetTemperatureValue = coolData.targetTemp != null ? coolData.targetTemp : '';
+        this.price = coolData.price != null ? coolData.price : '';
+      }
+      //   } else {
+      //     this.showErrorAlert = true;
+      //     console.error(response.data.message);
+      //   }
+      // }).catch(error => {
+      //   this.showConnectErrorAlert = true;
+      //   console.error('HTTP 请求失败：', error.message || '未知错误');
+      // });
+    },
+    updateACStatus(data) {
+      if (data.status == 0) {
+        this.fanSpeed = 0;
+        this.statusText = "关闭";
+      } else if (data.status == 1) {
+        this.fanSpeed = 1;
+        this.statusText = "低速";
+      } else if (data.status == 2) {
+        this.fanSpeed = 2;
+        this.statusText = "中速";
+      } else if (data.status == 3) {
+        this.fanSpeed = 3;
+        this.statusText = "高速";
+      } else if (data.status == 4) {
+        this.fanSpeed = 0;
+        this.statusText = "等待";
+      }
+      this.status = data.status
     },
     changeAC() {
-      // console.log(this.targetTemperature)
+      this.sendACData(this.fanSpeed);
+    },
+    sendACData(speed) {
       var data = JSON.stringify({
-        "targetTemperature": this.targetTemperature,
-        "status": this.fanSpeed
+        "targetTemperature": this.targetTemperatureValue,
+        "status": speed
       });
       axios({
         method: 'post',
@@ -144,7 +241,7 @@ export default {
         data: data
       }).then(response => {
         if (response.data.code === 200) {
-          console.log(response.data.message)
+
           this.fetchData();
         } else {
           console.error(response.data.message);
@@ -156,18 +253,18 @@ export default {
     adjustFanSpeed() {
       let fanSpeed = parseInt(this.fanSpeed);
       fanSpeed = (fanSpeed < 3) ? fanSpeed + 1 : 1;
-      this.fanSpeed = fanSpeed.toString();
-      
+      let speed = fanSpeed.toString();
+      this.sendACData(speed);
     },
     turn() {
-      if (this.status == 0  )  {
+      if (this.status == 0) {
         this.turnOnAC();
-      } else if(this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4){
+      } else if (this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4) {
         this.turnOffAC();
       }
     },
     turnOnAC() {
-      console.log("处理打开空调操作")
+      console.log("on")
       var data = JSON.stringify({
         "targetTemperature": this.targetTemperature,
         "status": this.fanSpeed
@@ -194,8 +291,6 @@ export default {
       });
     },
     turnOffAC() {
-      console.log("处理关闭空调操作")
-      console.log("关闭");
       axios({
         method: 'post',
         url: `${baseURL}/turnOff`,
@@ -220,28 +315,22 @@ export default {
 }
 </script>
 
-
 <style scoped>
 .air-conditioner-service {
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-color: #ffffff;
+  margin-left: 150px;
+  width: 80%;
   display: flex;
   flex-direction: column;
 }
 
-.content {
-  display: flex;
-  justify-content: space-between;
-}
+
 
 .control-panel {
-  width: 40%;
+  width: 50%;
   padding: 20px;
   border-radius: 10px;
   margin-top: 60px;
-  margin-left: 450px;
+  margin-left: 250px;
   margin-top: 13%;
 }
 

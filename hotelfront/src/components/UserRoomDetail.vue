@@ -1,15 +1,16 @@
 <template>
     <el-card class="control-panel" shadow="always">
         <div slot="header">
-            <span>Room Details</span>
+            <h2>房间详情</h2>
         </div>
         <div>
-            <p><strong>Customer Name:</strong> {{ room.customerName }}</p>
-            <p><strong>Start Time:</strong> {{ room.startTime }}</p>
-            <p><strong>Leave Time:</strong> {{ room.leaveTime }}</p>
-            <p><strong>Room ID:</strong> {{ room.roomId }}</p>
-            <p><strong>Price:</strong> {{ room.price }}</p>
-            <p><strong>Temperature:</strong> {{ room.temperature }}</p>
+            <p><strong>顾客姓名:</strong> {{ room.customerName }}</p>
+            <p><strong>入住时间:</strong> {{ room.startTime }}</p>
+            <p><strong>退房时间:</strong> {{ room.leaveTime }}</p>
+            <p><strong>房间号:</strong> {{ room.roomId }}</p>
+            <p><strong>价格:</strong> {{ room.price }}</p>
+            <p><strong>温度:</strong> {{ room.temperature }}</p>
+            <h6>[此项温度不为实时温度, 实时温度请查看空调页面]</h6>
         </div>
     </el-card>
 </template>
