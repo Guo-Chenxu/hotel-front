@@ -44,9 +44,9 @@
                                 <p><strong>房间ID:</strong> {{ this.Roomdetail.roomId }}</p>
                                 <p><strong>入住时间:</strong> {{ this.Roomdetail.checkInTime }}</p>
                                 <p><strong>退房时间:</strong> {{ this.Roomdetail.checkOutTime }}</p>
-                                <p><strong>截止目前房费:</strong> {{ this.Roomdetail.roomPrice }}</p>
-                                <p><strong>截止目前总房费:</strong> {{ this.Roomdetail.roomTotPrice }}</p>
-                                <p><strong>押金:</strong> {{ this.Roomdetail.deposit }}</p>
+                                <p><strong>截止目前房费:</strong> {{ this.Roomdetail.roomPrice }} 元</p>
+                                <p><strong>截止目前总房费:</strong> {{ this.Roomdetail.roomTotPrice }} 元</p>
+                                <p><strong>押金:</strong> {{ this.Roomdetail.deposit }} 元</p>
                             </div>
                             <button @click="downloadRoomBillPdf" class="el-button el-button--default">下载房间详单PDF</button>
                         </el-card>
@@ -63,14 +63,14 @@
                                 <li v-for="(foodBill, index) in Fooddetail" :key="index">
                                     <el-card>
                                         <p><strong>顾客ID:</strong> {{ foodBill.customerId }}</p>
-                                        <p><strong>总价:</strong> {{ foodBill.totalPrice }}</p>
+                                        <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
                                         <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
                                         <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
                                         <p><strong>食物清单:</strong></p>
                                         <ul>
                                             <li v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex">
                                                 <p>食物名: {{ food.name }}</p>
-                                                <p>价格: {{ food.price }}</p>
+                                                <p>价格: {{ food.price }} 元</p>
                                                 <p>数量: {{ food.quantity }}</p>
                                                 <p>图片: <img :src="food.img"
                                                         style="max-width: 100px; max-height: 100px;" /></p>
@@ -98,11 +98,11 @@
                                         <el-timeline-item :timestamp="acbill.createAt" placement="top">
                                             <el-card>
 
-                                                <p>单价：{{ acbill.price }}</p>
+                                                <p>单价：{{ acbill.price }} 元/分钟 </p>
                                                 <p>档位：{{ acbill.status }}</p>
-                                                <p>改变温度：{{ acbill.changeTemperature }} 元</p>
-                                                <p>此次服务时长：{{ acbill.duration }}</p>
-                                                <p>此次服务总价：{{ acbill.totalPrice }}</p>
+                                                <p>改变温度：{{ acbill.changeTemperature }} °C</p>
+                                                <p>此次服务时长：{{ acbill.duration }} 分钟</p>
+                                                <p>此次服务总价：{{ acbill.totalPrice }} 元</p>
 
                                             </el-card>
                                         </el-timeline-item>

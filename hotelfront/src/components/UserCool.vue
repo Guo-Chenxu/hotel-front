@@ -18,7 +18,10 @@
               </div>
               <div class="led-row">
                 <el-text>预期温度: </el-text>
-                <el-input v-model="targetTemperatureValue" style="width: 60px;" @change="changeAC" />
+                <el-input-number v-model="targetTemperatureValue" controls-position="right" style=" width:100px"  @change="changeAC">
+
+                </el-input-number>
+                
                 <span>°C</span>
               </div>
               <div class="led-row">
@@ -37,10 +40,13 @@
             </div>
             <!-- 下半部分：调节按钮 -->
             <div class="control-buttons">
-              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn">{{ this.status == 0 ? '开启' : '关闭'
-                }}</el-button>
+              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn" >{{ this.status == 0 ? '开启' : '关闭'
+              }}</el-button>
+
               <el-button @click="adjustFanSpeed">调节风速</el-button>
             </div>
+
+
 
           </el-card>
 
@@ -55,22 +61,20 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
-
   </div>
 </template>
 
 <script>
-
+import store from '@/store';
 import axios from 'axios';
+
 const baseURL = 'http://10.29.23.17:29010/api/customer/cool';
-
-
 export default {
   data() {
     return {
       activeTab: 'tab1',
-      currentTemperature: '',
       changeTmp: '',
+      currentTemperature: '',
       targetTemperatureValue: 25,
       status: '',
       fanSpeed: 1,
@@ -98,16 +102,41 @@ export default {
       },
     }
   },
-
   mounted() {
-    this.fetchData();
-    // 监听数据变化
-    // this.$watch(() => [this.currentTemperature], () => {
-    //   console.log("watching");
-    //   this.fetchData(); // 数据变化时重新获取数据
-    // }, { deep: true });
+    const ws = store.state.websocket
+    //const ws = localStorage.getItem('Websocket');
+    console.log(ws)
+    if (ws) {
+      //const ws = JSON.parse(storedWebSocket);
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        this.currentTemperature = data.temperature.toFixed(2);
+        this.status = data.status
+        this.changeTmp = data.changeTemp != null ? data.changeTemp : ''
+        this.targetTemperatureValue = data.targetTemp != null ? data.targetTemp :''
+        this.price = data.price != null ? data.price : ''
+        if (data.status == 0) {
+          this.fanSpeed = 0;
+          this.statusText = "关闭";
+        } else if (data.status == 1) {
+          this.fanSpeed = 1;
+          this.statusText = "低速";
+        } else if (data.status == 2) {
+          this.fanSpeed = 2;
+          this.statusText = "中速";
+        } else if (data.status == 3) {
+          this.fanSpeed = 3;
+          this.statusText = "高速";
+        } else if (data.status == 4) {
+          this.fanSpeed = 0;
+          this.statusText = "等待";
+        }
+      };
+    }
   },
+
   computed: {
+
     tableData() {
       return [
         { parameter: '空调台数', value: this.airConditioningProperties.count },
@@ -140,7 +169,97 @@ export default {
   },
   methods: {
     handleTabClick() {
-      this.showCoolData();
+            this.showCoolData();
+        },
+        showCoolData() {
+            axios({
+                method: 'get',
+                url: `${baseURL}/properties`,
+                headers: {
+                    Authorization: localStorage.getItem('token')
+                }
+            }).then(response => {
+                if (response.data.code === 200) {
+
+                    this.airConditioningProperties = response.data.data
+                    console.log("获取空调属性成功");
+                } else {
+                    this.showErrorAlert = true;
+                    console.error(response.data.message);
+                }
+
+            })
+                .catch(error => {
+                    console.error('获取空调属性失败:', error);
+                });
+        },
+    
+    turn() {
+      if (this.status == 0) {
+        this.changeAC();
+      } else if (this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4) {
+        this.turnOffAC();
+      }
+
+    },
+    turnOffAC() {
+            console.log("处理关闭空调操作")
+            console.log("关闭");
+            axios({
+                method: 'post',
+                url: `${baseURL}/turnOff`,
+                headers: {
+
+                    Authorization: localStorage.getItem('token')
+                },
+            }).then(response => {
+                if (response.data.code === 200) {
+
+                    console.log(response.data.message);
+                    
+                } else {
+
+                    console.error(response.data.message);
+                }
+            }).catch(error => {
+
+                console.error('HTTP 请求失败：', error.message || '未知错误');
+            });
+        },
+    adjustFanSpeed() {
+      let fanSpeed = parseInt(this.fanSpeed);
+      fanSpeed = (fanSpeed < 3) ? fanSpeed + 1 : 1;
+      this.fanSpeed = fanSpeed.toString();
+      this.changeAC()
+    },
+    changeAC() {
+      var status = this.status
+      if (status != 0 && status != 4)
+        status = this.fanSpeed
+      else
+        status = this.status
+      
+      var data = JSON.stringify({
+        "targetTemperature": this.targetTemperatureValue,
+        "status": status
+      });
+      axios({
+        method: 'post',
+        url: `${baseURL}/change`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('token')
+        },
+        data: data
+      }).then(response => {
+        if (response.data.code === 200) {
+          console.log(response.data.message)
+        } else {
+          console.error(response.data.message);
+        }
+      }).catch(error => {
+        console.error("请求失败：", error.message || "未知错误");
+      });
     },
     getGearName(gear) {
       switch (gear) {
@@ -154,166 +273,11 @@ export default {
           return '未知';
       }
     },
-    showCoolData() {
-      axios({
-        method: 'get',
-        url: `${baseURL}/properties`,
-        headers: {
-          Authorization: localStorage.getItem('token')
-        }
-      }).then(response => {
-        if (response.data.code === 200) {
-          this.airConditioningProperties = response.data.data
-          console.log("获取空调属性成功");
-        } else {
-          console.error(response.data.message);
-        }
-      })
-        .catch(error => {
-          console.error('获取空调属性失败:', error);
-        });
-    },
-    fetchData() {
-      // axios({
-      //   method: 'get',
-      //   url: `${baseURL}/acStatus`,
-      //   headers: {
-      //     Authorization: localStorage.getItem('token')
-      //   },
-      // }).then(response => {
-      //   if (response.data.code === 200) {
-      //     console.log(response.data.data)
-      var coolData = localStorage.getItem("cool");
-      if (coolData) {
-        //var data = response.data.data;
-
-        coolData = JSON.parse(coolData);
-        this.updateACStatus(coolData);
-        console.log(coolData)
-        this.changeTmp = coolData.changeTemp != null ? coolData.changeTemp : '';
-        this.currentTemperature = coolData.temperature != null ? coolData.temperature.toFixed(2) : '';
-        this.targetTemperatureValue = coolData.targetTemp != null ? coolData.targetTemp : '';
-        this.price = coolData.price != null ? coolData.price : '';
-      }
-      //   } else {
-      //     this.showErrorAlert = true;
-      //     console.error(response.data.message);
-      //   }
-      // }).catch(error => {
-      //   this.showConnectErrorAlert = true;
-      //   console.error('HTTP 请求失败：', error.message || '未知错误');
-      // });
-    },
-    updateACStatus(data) {
-      if (data.status == 0) {
-        this.fanSpeed = 0;
-        this.statusText = "关闭";
-      } else if (data.status == 1) {
-        this.fanSpeed = 1;
-        this.statusText = "低速";
-      } else if (data.status == 2) {
-        this.fanSpeed = 2;
-        this.statusText = "中速";
-      } else if (data.status == 3) {
-        this.fanSpeed = 3;
-        this.statusText = "高速";
-      } else if (data.status == 4) {
-        this.fanSpeed = 0;
-        this.statusText = "等待";
-      }
-      this.status = data.status
-    },
-    changeAC() {
-      this.sendACData(this.fanSpeed);
-    },
-    sendACData(speed) {
-      var data = JSON.stringify({
-        "targetTemperature": this.targetTemperatureValue,
-        "status": speed
-      });
-      axios({
-        method: 'post',
-        url: `${baseURL}/change`,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: localStorage.getItem('token')
-        },
-        data: data
-      }).then(response => {
-        if (response.data.code === 200) {
-
-          this.fetchData();
-        } else {
-          console.error(response.data.message);
-        }
-      }).catch(error => {
-        console.error("请求失败：", error.message || "未知错误");
-      });
-    },
-    adjustFanSpeed() {
-      let fanSpeed = parseInt(this.fanSpeed);
-      fanSpeed = (fanSpeed < 3) ? fanSpeed + 1 : 1;
-      let speed = fanSpeed.toString();
-      this.sendACData(speed);
-    },
-    turn() {
-      if (this.status == 0) {
-        this.turnOnAC();
-      } else if (this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4) {
-        this.turnOffAC();
-      }
-    },
-    turnOnAC() {
-      console.log("on")
-      var data = JSON.stringify({
-        "targetTemperature": this.targetTemperature,
-        "status": this.fanSpeed
-      });
-      axios({
-        method: 'post',
-        url: `${baseURL}/turnOn`,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: localStorage.getItem('token')
-        },
-        data: data
-      }).then(response => {
-        if (response.data.code === 200) {
-          console.log(response.data.message);
-          this.fetchData();
-        } else {
-
-          console.error(response.data.message);
-          this.power = !this.power;
-        }
-      }).catch(error => {
-        console.error("请求失败：", error.message || "未知错误");
-      });
-    },
-    turnOffAC() {
-      axios({
-        method: 'post',
-        url: `${baseURL}/turnOff`,
-        headers: {
-          Authorization: localStorage.getItem('token')
-        },
-      }).then(response => {
-        if (response.data.code === 200) {
-
-          console.log(response.data.message);
-          this.fetchData();
-        } else {
-
-          console.error(response.data.message);
-        }
-      }).catch(error => {
-
-        console.error('HTTP 请求失败：', error.message || '未知错误');
-      });
-    }
   }
 }
 </script>
+
+
 
 <style scoped>
 .air-conditioner-service {
@@ -322,7 +286,6 @@ export default {
   display: flex;
   flex-direction: column;
 }
-
 
 
 .control-panel {

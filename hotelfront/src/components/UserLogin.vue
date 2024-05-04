@@ -29,7 +29,9 @@
 
 
 <script>
+import store from '@/store';
 import axios from 'axios';
+const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 const baseURL = 'http://10.29.23.17:29010/api/customer/customer/login';
 export default {
   name: 'UserLogin',
@@ -65,13 +67,14 @@ export default {
             }).then(response => {
               if (response.data.code === 200) {
                 console.log("watchAC success")
+                this.setupWebSocket();
               } else {
                 console.error(response.data.message);
               }
             }).catch(error => {
               console.error("请求失败：", error.message || "未知错误");
             });
-            this.initWebSocket();
+            // this.initWebSocket();
           } else {
             console.error("error:" + response.data.message);
           }
@@ -80,26 +83,30 @@ export default {
         });
       }
     },
-    initWebSocket() {
-      const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
-      
-      this.ws = new WebSocket(wsURL);
-      
-      this.ws.onopen = () => {
+    setupWebSocket() {
+      const ws = new WebSocket(wsURL);
+
+      ws.onopen = () => {
         console.log('WebSocket connected');
+        // const ws = new WebSocket(wsURL);
+        //localStorage.setItem('WebSocket', ws)
+      // Store WebSocket instance in Vuex
+        store.dispatch('setWebSocket', ws);
       };
 
-      this.ws.onmessage = (event) => {
-        localStorage.setItem('cool', event.data);
-      };
+      // ws.onmessage = (event) => {
+      //   //console.log('Received message:', event.data); // 打印消息到控制台
+      //   //const data = JSON.parse(event.data);
+      // //   const ws = new WebSocket(wsURL);
+      
+      // // // Store WebSocket instance in Vuex
+      // // this.$store.dispatch('setWebSocket', ws);
+        
+        
+      //   // this.currentTemperature = data.toFixed(2);
 
-      this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
+      // };
 
-      this.ws.onclose = () => {
-        console.log('WebSocket closed');
-      };
     },
   },
 }
