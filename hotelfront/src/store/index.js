@@ -5,7 +5,9 @@ export default createStore({
     return {
       token: '', // 初始化状态
       roomId: '',
-      userId: ''
+      userId: '',
+      cool: '',
+      websocket: null // Store WebSocket instance
     };
   },
   mutations: {
@@ -17,6 +19,12 @@ export default createStore({
     },
     setUserId(state, newUserId) {
       state.userId = newUserId; 
+    },
+    setCool(state, newCool) {
+      state.cool = newCool; 
+    },
+    setWebSocket(state, ws) {
+      state.websocket = ws; // Store WebSocket instance
     }
   },
   actions: {
@@ -28,6 +36,12 @@ export default createStore({
     },
     updateUserId({ commit }, newUserId) {
       commit('setUserId', newUserId); 
+    },
+    updateCool({ commit }, newCool) {
+      commit('setCool', newCool); 
+    },
+    setWebSocket({ commit }, ws) {
+      commit('setWebSocket', ws); // Store WebSocket instance in Vuex store
     }
   },
   getters: {
@@ -40,6 +54,11 @@ export default createStore({
     getUserId(state) {
       return state.userId;
     },
-    
+    getCool(state) {
+      return state.cool;
+    },
+    getWebSocket(state) {
+      return state.websocket; // Get WebSocket instance from Vuex store
+    }
   }
 });

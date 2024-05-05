@@ -22,6 +22,7 @@ export default {
 
     data() {
         return {
+            
             room: {
                 customerName: "",
                 startTime: "",
@@ -48,6 +49,9 @@ export default {
             }).then(response => {
                 if (response.data.code === 200) {
                     this.room = response.data.data;
+                    // 将字符串类型的温度转换为数字类型，然后保留两位小数
+                this.room.temperature = parseFloat(response.data.data.temperature).toFixed(2);
+                    
                 } else {
                     console.error(response.data.message);
                 }

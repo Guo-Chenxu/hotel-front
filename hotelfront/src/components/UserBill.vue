@@ -16,7 +16,7 @@
                     </template>
                     <div>
 
-                        <p><strong>房间ID:</strong> {{ this.bill.roomId }}</p>
+                        <p><strong>房间号:</strong> {{ this.bill.roomId }}</p>
                         <p><strong>入住时间:</strong> {{ this.bill.checkInTime }}</p>
                         <p><strong>退房时间:</strong> {{ this.bill.checkOutTime }}</p>
                         <p><strong>截止目前总房费:</strong> {{ this.bill.roomTotPrice }}</p>
@@ -40,8 +40,7 @@
                                 </div>
                             </template>
                             <div>
-                                <p><strong>顾客ID:</strong> {{ this.Roomdetail.customerId }}</p>
-                                <p><strong>房间ID:</strong> {{ this.Roomdetail.roomId }}</p>
+                                <p><strong>房间号:</strong> {{ this.Roomdetail.roomId }}</p>
                                 <p><strong>入住时间:</strong> {{ this.Roomdetail.checkInTime }}</p>
                                 <p><strong>退房时间:</strong> {{ this.Roomdetail.checkOutTime }}</p>
                                 <p><strong>截止目前房费:</strong> {{ this.Roomdetail.roomPrice }} 元</p>
@@ -62,18 +61,15 @@
                             <ul>
                                 <li v-for="(foodBill, index) in Fooddetail" :key="index">
                                     <el-card>
-                                        <p><strong>顾客ID:</strong> {{ foodBill.customerId }}</p>
                                         <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
                                         <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
                                         <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
                                         <p><strong>食物清单:</strong></p>
                                         <ul>
-                                            <li v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex">
-                                                <p>食物名: {{ food.name }}</p>
-                                                <p>价格: {{ food.price }} 元</p>
-                                                <p>数量: {{ food.quantity }}</p>
-                                                <p>图片: <img :src="food.img"
-                                                        style="max-width: 100px; max-height: 100px;" /></p>
+                                            <li v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
+                                                <p><strong>食物：</strong>{{ food.name }}</p>
+                                                <p><strong>价格：</strong>{{ food.price }}</p>
+                                                <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
                                             </li>
                                         </ul>
                                     </el-card>
@@ -274,6 +270,7 @@ export default {
                 console.log(response.data.data)
                 if (response.data.code === 200) {
                     this.Cooldetail = response.data.data;
+                    
                 } else {
                     console.error(response.data.message);
                 }
@@ -468,5 +465,9 @@ export default {
     width: 80%; 
     max-width: 1000px;
     height: 100%;
+  }
+
+  .food-item {
+    justify-content: space-between; /* 在容器内部平均分配空间，使子元素对齐 */
   }
 </style>

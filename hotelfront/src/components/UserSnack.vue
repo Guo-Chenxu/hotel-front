@@ -45,13 +45,16 @@
                 <el-timeline-item :timestamp="order.createAt" placement="top">
                   <el-card>
 
-                    <div v-for="(food, index) in order.foods" :key="index">
-                      <p>食物：{{ food.name }}</p>
-                      <p>价格：{{ food.price }}</p>
-                      <p>图片: <img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
+                    <div>
+                      <div v-for="(food, index) in order.foods" :key="index" class="food-item">
+                        <p><strong>食物：</strong>{{ food.name }}</p>
+                        <p><strong>价格：</strong>{{ food.price }}</p>
+                        <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
+                      </div>
+                      <p><strong>总价：</strong>{{ order.totalPrice }} 元</p>
+                      <p><strong>备注：</strong>{{ order.remarks }}</p>
                     </div>
-                    <p>总价：{{ order.totalPrice }} 元</p>
-                    <p>备注：{{ order.remarks }}</p>
+                    
                   </el-card>
                 </el-timeline-item>
               </el-timeline>
@@ -272,4 +275,8 @@ export default {
   margin-bottom: 20px;
   justify-content: center;
 }
+.food-item {
+  justify-content: space-between; /* 在容器内部平均分配空间，使子元素对齐 */
+}
+
 </style>
