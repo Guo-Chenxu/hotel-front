@@ -15,7 +15,6 @@
                         </div>
                     </template>
                     <div>
-
                         <p><strong>房间号:</strong> {{ this.bill.roomId }}</p>
                         <p><strong>入住时间:</strong> {{ this.bill.checkInTime }}</p>
                         <p><strong>退房时间:</strong> {{ this.bill.checkOutTime }}</p>
@@ -30,58 +29,37 @@
             </el-tab-pane>
 
             <el-tab-pane label="详单" name="detailed">
+                <el-form-item label="详单类型:" style="margin-left:35%">
+                    <el-select v-model="selectedDetailType" multiple placeholder="Select" style="width: 240px">
+                        <el-option label="住宿" value="1"></el-option>
+                        <el-option label="纳凉" value="2"></el-option>
+                        <el-option label="餐饮" value="3"></el-option>
+                    </el-select>
+                </el-form-item>
 
-                <el-tabs v-model="detailTab" type="border-card">
-                    <el-tab-pane label="查看住宿详单" name="accommodation">
-                        <el-card class="control-panel" shadow="always">
-                            <template #header>
-                                <div class="card-header">
-                                    <span>住宿详单</span>
-                                </div>
-                            </template>
-                            <div>
-                                <p><strong>房间号:</strong> {{ this.Roomdetail.roomId }}</p>
-                                <p><strong>入住时间:</strong> {{ this.Roomdetail.checkInTime }}</p>
-                                <p><strong>退房时间:</strong> {{ this.Roomdetail.checkOutTime }}</p>
-                                <p><strong>截止目前房费:</strong> {{ this.Roomdetail.roomPrice }} 元</p>
-                                <p><strong>截止目前总房费:</strong> {{ this.Roomdetail.roomTotPrice }} 元</p>
-                                <p><strong>押金:</strong> {{ this.Roomdetail.deposit }} 元</p>
+                <el-button @click="fetchDetail" round style="margin-bottom:20px">查看详单</el-button>
+                <el-button @click="downloadBillStatementPdf" class="el-button el-button--default" style="margin-bottom:20px">下载详单PDF</el-button>
+                
+                <div v-if="this.ROOM">
+                    <el-card class="control-panel" shadow="always">
+                        <template #header>
+                            <div class="card-header">
+                                <span>住宿详单</span>
                             </div>
-                            <button @click="downloadRoomBillPdf" class="el-button el-button--default">下载房间详单PDF</button>
-                        </el-card>
-                    </el-tab-pane>
-
-                    <el-tab-pane label="餐饮详单" name="dining">
-                        <el-card class="control-panel" shadow="always">
-                            <template #header>
-                                <div class="card-header">
-                                    <span>餐饮详单</span>
-                                </div>
-                            </template>
-                            <ul>
-                                <li v-for="(foodBill, index) in Fooddetail" :key="index">
-                                    <el-card>
-                                        <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
-                                        <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
-                                        <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
-                                        <p><strong>食物清单:</strong></p>
-                                        <ul>
-                                            <li v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
-                                                <p><strong>食物：</strong>{{ food.name }}</p>
-                                                <p><strong>价格：</strong>{{ food.price }}</p>
-                                                <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
-                                            </li>
-                                        </ul>
-                                    </el-card>
-                                </li>
-                            </ul>
-                            <button @click="downloadSnackBillPdf"
-                                class="el-button el-button--default">下载餐饮详单PDF</button>
-                        </el-card>
-                    </el-tab-pane>
-
-
-                    <el-tab-pane label="纳凉详单" name="cooling">
+                        </template>
+                        <div>
+                            <p><strong>房间号:</strong> {{ this.Roomdetail.roomId }}</p>
+                            <p><strong>入住时间:</strong> {{ this.Roomdetail.checkInTime }}</p>
+                            <p><strong>退房时间:</strong> {{ this.Roomdetail.checkOutTime }}</p>
+                            <p><strong>截止目前房费:</strong> {{ this.Roomdetail.roomPrice }} 元</p>
+                            <p><strong>截止目前总房费:</strong> {{ this.Roomdetail.roomTotPrice }} 元</p>
+                            <p><strong>押金:</strong> {{ this.Roomdetail.deposit }} 元</p>
+                        </div>
+                        
+                    </el-card>
+                </div>
+                <div v-if="this.COOL">
+                    
                         <el-card class="control-panel" shadow="always">
                             <template #header>
                                 <div class="card-header">
@@ -91,7 +69,7 @@
                             <p> <strong>空调详单:</strong>
                                 <li v-for="acbill in this.Cooldetail.acBillList" class="infinite-list-item">
                                     <el-timeline style="max-width: 600px">
-                                        <el-timeline-item :timestamp="acbill.createAt" placement="top">
+                                        <el-timeline-item :timestamp="formatDateTime(acbill.createAt)" placement="top">
                                             <el-card>
 
                                                 <p>单价：{{ acbill.price }} 元/分钟 </p>
@@ -107,10 +85,43 @@
                             </p>
                             <p><strong>空调总价:</strong> {{ this.Cooldetail.acPrice }}</p>
 
-                            <button @click="downloadCoolBillPdf" class="el-button el-button--default">下载纳凉详单PDF</button>
+                            
                         </el-card>
-                    </el-tab-pane>
-                </el-tabs>
+                    
+                </div>
+                <div v-if="this.SNACK">
+                    <el-card class="control-panel" shadow="always">
+                        <template #header>
+                            <div class="card-header">
+                                <span>餐饮详单</span>
+                            </div>
+                        </template>
+                        <ul>
+                            <li v-for="(foodBill, index) in Fooddetail" :key="index">
+                                <el-card>
+                                    <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
+                                    <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
+                                    <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
+                                    <p><strong>食物清单:</strong></p>
+                                    <ul>
+                                        <li v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
+                                            <p><strong>食物：</strong>{{ food.name }}</p>
+                                            <p><strong>价格：</strong>{{ food.price }}</p>
+                                            <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
+                                        </li>
+                                    </ul>
+                                </el-card>
+                            </li>
+                        </ul>
+                        
+                    </el-card>
+                </div>
+
+                
+
+
+                    
+                
             </el-tab-pane>
         </el-tabs>
 
@@ -119,7 +130,7 @@
 </template>
 
 <script>
-
+import { ROOM_TYPE, COOL_TYPE, SNACK_TYPE } from '../constants/constants';
 import axios from 'axios'
 const baseURL = 'http://10.29.23.17:29010/api/customer/bill';
 import * as echarts from 'echarts';
@@ -127,6 +138,10 @@ import * as echarts from 'echarts';
 export default {
     data() {
         return {
+            ROOM: false,
+            COOL: false,
+            SNACK: false,
+            selectedDetailType: [],
             activeTab: 'chart',
             detailTab: '',
             bill: {
@@ -149,22 +164,6 @@ export default {
         this.fetchBill();
     },
     watch: {
-        detailTab(newTab) {
-            // 根据选中的详单标签页调用不同的方法
-            switch (newTab) {
-                case 'accommodation':
-                    this.fetchRoomBill();
-                    break;
-                case 'dining':
-                    this.fetchSnackBill();
-                    break;
-                case 'cooling':
-                    this.fetchCoolBill();
-                    break;
-                default:
-                    break;
-            }
-        },
         bill: {
             handler() {
                 this.drawPieChart();
@@ -174,6 +173,13 @@ export default {
     },
 
     methods: {
+        formatDateTime(dateTime) {
+      const date = new Date(dateTime);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
         fetchBill() {
 
             axios({
@@ -192,6 +198,55 @@ export default {
             }).catch(error => {
                 console.error("请求失败：", error.message || "未知错误");
             });
+        },
+        fetchDetail() {
+            this.ROOM = false;
+            this.COOL = false;
+            this.SNACK = false;
+            // 将用户选择的详单类型转换为字符串，用逗号分隔发送给后端
+            const types = this.selectedDetailType.join(',');
+            if (this.selectedDetailType.includes(ROOM_TYPE))
+                this.ROOM = true;
+            if (this.selectedDetailType.includes(COOL_TYPE))
+                this.COOL = true;
+            if (this.selectedDetailType.includes(SNACK_TYPE))
+                this.SNACK = true;
+            axios({
+                method: 'get',
+                url: `${baseURL}/billStatement/?type=${types}`,
+                headers: {
+                    Authorization: localStorage.getItem('token')
+                },
+            }).then(response => {
+                // 根据后端返回的数据更新对应的详单数据
+                // 注意：需要根据实际返回的数据结构进行修改
+                this.Roomdetail = response.data.data;
+                this.Cooldetail = response.data.data;
+                this.Fooddetail = response.data.data.foodBillList.map(foodBill => {
+                    var foods = [];
+                    for (const [foodStr] of Object.entries(foodBill.foods)) {
+                        const food = JSON.parse(foodStr);
+                        foods.push({
+                            name: food.name,
+                            price: food.price,
+                            img: food.img,
+                        });
+                    }
+
+                    return {
+                        id: foodBill.id,
+                        customerId: foodBill.customerId,
+                        foods: foods,
+                        totalPrice: foodBill.totalPrice,
+                        remarks: foodBill.remarks,
+                        createAt: foodBill.createAt
+                    };
+                })
+
+            })
+                .catch(error => {
+                    console.error("请求失败：", error.message || "未知错误");
+                });
         },
         fetchRoomBill() {
             console.log("fecthRoom")
@@ -213,74 +268,6 @@ export default {
                 console.error("请求失败：", error.message || "未知错误");
             });
         },
-        fetchSnackBill() {
-            console.log("fecthSnack")
-            axios({
-                method: 'get',
-                url: `${baseURL}/billStatement?type=${3}`,
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                },
-            }).then(response => {
-                console.log(response.data.data)
-                if (response.data.code === 200) {
-                    // 对每个 foodBill 进行处理
-                    this.Fooddetail = response.data.data.foodBillList.map(foodBill => {
-                        var foods = [];
-                        // 遍历 foods 对象的键值对
-                        for (const [foodStr] of Object.entries(foodBill.foods)) {
-                            const food = JSON.parse(foodStr); // 解析 JSON 字符串为对象
-                            foods.push({ // 将食物信息和数量整合起来
-                                name: food.name,
-                                price: food.price,
-                                img: food.img,
-                            });
-                        }
-                        // 返回处理后的 foodBill 对象
-                        return {
-                            id: foodBill.id,
-                            customerId: foodBill.customerId,
-                            foods: foods,
-                            totalPrice: foodBill.totalPrice,
-                            remarks: foodBill.remarks,
-                            createAt: foodBill.createAt
-                        };
-                    });
-                } else {
-                    console.error(response.data.message);
-                }
-            }).catch(error => {
-                console.error("请求失败：", error.message || "未知错误");
-            });
-        },
-
-
-
-
-        fetchCoolBill() {
-            console.log("fecthCool")
-
-            axios({
-                method: 'get',
-                url: `${baseURL}/billStatement?type=${2}`,
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                },
-            }).then(response => {
-                console.log(response.data.data)
-                if (response.data.code === 200) {
-                    this.Cooldetail = response.data.data;
-                    
-                } else {
-                    console.error(response.data.message);
-                }
-            }).catch(error => {
-                console.error("请求失败：", error.message || "未知错误");
-            });
-        },
-
-
-
         drawPieChart() {
 
             const pieChart = echarts.init(document.getElementById('pieChart'));
@@ -360,86 +347,38 @@ export default {
                 console.error("请求失败：", error.message || "未知错误");
             });
         },
-        downloadRoomBillPdf() {
-            axios({
-                method: 'get',
-                url: `${baseURL}/downloadBillStatement?type=${1}`,
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                },
-                responseType: 'blob'
-            }).then(response => {
-                // 创建一个临时的下载链接
-                const url = window.URL.createObjectURL(new Blob([response.data]));
+        downloadBillStatementPdf() {
+            const types = this.selectedDetailType.join(',');
+            if (!types) {
+                this.$message.error('请先选择详单类型');
+            } else {
+                axios({
+                    method: 'get',
+                    url: `${baseURL}/downloadBillStatement/?type=${types}`,
+                    headers: {
+                        Authorization: localStorage.getItem('token')
+                    },
+                    responseType: 'blob'
+                }).then(response => {
+                    // 创建一个临时的下载链接
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
 
-                // 创建一个虚拟的链接元素
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'RoomBill.pdf';
+                    // 创建一个虚拟的链接元素
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'RoomBill.pdf';
 
-                // 模拟点击下载链接
-                link.click();
+                    // 模拟点击下载链接
+                    link.click();
 
-                // 清理临时链接
-                window.URL.revokeObjectURL(url);
-            }).catch(error => {
-                console.error("请求失败：", error.message || "未知错误");
-            });
+                    // 清理临时链接
+                    window.URL.revokeObjectURL(url);
+                }).catch(error => {
+                    console.error("请求失败：", error.message || "未知错误");
+                });
+            }
         },
-        downloadSnackBillPdf() {
-            axios({
-                method: 'get',
-                url: `${baseURL}/downloadBillStatement?type=${3}`,
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                },
-                responseType: 'blob'
-            }).then(response => {
 
-                // 创建一个临时的下载链接
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-
-                // 创建一个虚拟的链接元素
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'SnackBill.pdf';
-
-                // 模拟点击下载链接
-                link.click();
-
-                // 清理临时链接
-                window.URL.revokeObjectURL(url);
-            }).catch(error => {
-                console.error("请求失败：", error.message || "未知错误");
-            });
-        },
-        downloadCoolBillPdf() {
-            axios({
-                method: 'get',
-                url: `${baseURL}/downloadBillStatement?type=${2}`,
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                },
-                responseType: 'blob'
-
-            }).then(response => {
-                // 创建一个临时的下载链接
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-
-                // 创建一个虚拟的链接元素
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'CoolBill.pdf';
-
-                // 模拟点击下载链接
-                link.click();
-
-                // 清理临时链接
-                window.URL.revokeObjectURL(url);
-            }).catch(error => {
-                console.error("请求失败：", error.message || "未知错误");
-            });
-        },
 
     }
 

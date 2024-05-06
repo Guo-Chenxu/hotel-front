@@ -104,10 +104,7 @@ export default {
   },
   mounted() {
     const ws = store.state.websocket
-    //const ws = localStorage.getItem('Websocket');
-    console.log(ws)
     if (ws) {
-      //const ws = JSON.parse(storedWebSocket);
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         this.currentTemperature = data.temperature.toFixed(2);

@@ -15,7 +15,7 @@
           </el-collapse-item>
         </el-collapse>
         <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next"
-          :total= this.totalItems>
+          :total= this.totalItems  :page-size="this.pageSize">
         </el-pagination>
         <el-dialog ref="remarkDialog" v-model="dialogVisible" title="订餐详情">
           <p v-if="currentSnack">{{ currentSnack.name }}</p>
@@ -42,7 +42,7 @@
           <ul class="infinite-list" style="overflow: auto;height:400px">
             <li v-for="order in visibleOrders" class="infinite-list-item">
               <el-timeline style="max-width: 600px">
-                <el-timeline-item :timestamp="order.createAt" placement="top">
+                <el-timeline-item :timestamp="formatDateTime(order.createAt)" placement="top">
                   <el-card>
 
                     <div>
@@ -103,7 +103,13 @@ export default {
     },
 
 
-
+    formatDateTime(dateTime) {
+      const date = new Date(dateTime);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
 
 
     /**
@@ -134,6 +140,9 @@ export default {
         console.log(response.data);
         if (response.data.code == 200) {
           this.dialogVisible = false;
+          this.$message.success('点餐成功');
+          this.currentSnack.quantity = ''
+          this.currentSnack.remark = ''
         } else {
           console.error(response.data.message);
         }
@@ -198,7 +207,6 @@ export default {
 
     },
     showSnacks() {
-      
       axios({
         method: 'get',
         url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`,
