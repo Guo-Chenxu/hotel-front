@@ -61,7 +61,7 @@ export default {
             // 监控空调
             axios({
               method: 'get',
-              url: 'http://10.29.23.17:29010/api/customer/cool/watchAC',
+              url: `${api.baseURL}/cool/watchAC`,
               headers: {
                 Authorization: localStorage.getItem('token')
               },
