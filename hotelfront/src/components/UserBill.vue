@@ -132,7 +132,8 @@
 <script>
 import { ROOM_TYPE, COOL_TYPE, SNACK_TYPE } from '../constants/constants';
 import axios from 'axios'
-const baseURL = 'http://10.29.23.17:29010/api/customer/bill';
+import api from '@/api'; 
+const baseURL = `${api.baseURL}/bill`;
 import * as echarts from 'echarts';
 
 export default {

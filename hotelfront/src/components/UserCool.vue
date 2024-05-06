@@ -67,8 +67,8 @@
 <script>
 import store from '@/store';
 import axios from 'axios';
-
-const baseURL = 'http://10.29.23.17:29010/api/customer/cool';
+import api from '@/api'; // 替换为实际的文件路径
+const baseURL = `${api.baseURL}/cool`;
 export default {
   data() {
     return {

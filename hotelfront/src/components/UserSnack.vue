@@ -71,8 +71,8 @@
 
 <script>
 import axios from 'axios';
-
-const baseURL = 'http://10.29.23.17:29010/api/customer/food/';
+import api from '@/api'; 
+const baseURL = `${api.baseURL}/food`;
 
 export default {
   data() {
@@ -130,7 +130,7 @@ export default {
       var data = JSON.stringify(order);
       axios({
         method: 'post',
-        url: `${baseURL}order`,
+        url: `${baseURL}/order`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: localStorage.getItem('token') // 获取存储的token
@@ -159,7 +159,7 @@ export default {
       console.log("token:" + localStorage.getItem('token'));
       axios({
         method: 'get',
-        url: `${baseURL}history`,
+        url: `${baseURL}/history`,
         headers: {
           Authorization: localStorage.getItem('token') // 获取存储的token
         }
@@ -209,7 +209,7 @@ export default {
     showSnacks() {
       axios({
         method: 'get',
-        url: `${baseURL}page?page=${this.page}&pageSize=${this.pageSize}`,
+        url: `${baseURL}/page?page=${this.page}&pageSize=${this.pageSize}`,
         headers: {
           Authorization: localStorage.getItem('token')
         }
