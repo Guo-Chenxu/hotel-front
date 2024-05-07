@@ -33,7 +33,7 @@ import store from '@/store';
 import axios from 'axios';
 const wsURL = `ws://10.29.23.17:29010/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 import api from '@/api'; 
-const baseURL = `${api.baseURL}/login`;
+const baseURL = `${api.baseURL}/customer/login`;
 export default {
   name: 'UserLogin',
   data() {
