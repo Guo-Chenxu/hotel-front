@@ -1,6 +1,6 @@
 <template>
     <div class="user-main">
-        <img src="../assets/userview.png" style="margin-left:130px;margin-right:-100px;width: 100%; height: 100%; opacity: 0.5;">
+        <img src="../assets/userview.png" style="height: 100%; opacity: 0.5; position: fixed;">
         <div class="rectangle">
             <div class="rectangle1">
                 <h1></h1>
@@ -23,9 +23,7 @@
     </div>
 </template>
 
-
 <script>
-
 export default {
     name: 'UserMain',
 }
@@ -33,29 +31,34 @@ export default {
 
 <style scoped>
 .user-main {
-    background-size: cover;
-    background-position: center;
+    
+    margin-left: 0px;
+    background-size: 100% 100%; /* 背景铺满整个容器 */
+    background-position: center; /* 背景居中显示 */
     font-family: 'Roboto', sans-serif;
     text-align: center;
     color: #ffffff;
     overflow: hidden;
     height: 100vh;
-    width: 120%;
-    margin-top:-20px;
-    margin-left:-6px;
-    
+    width: 100%; /* 宽度设置为100% */
+    margin-top: -50px;
+    display: flex; /* 使用 Flexbox 布局 */
+    justify-content: center; /* 在水平方向居中 */
+    align-items: center; /* 在垂直方向居中 */
 }
+
 .rectangle {
-    margin-top: -42%;
-    margin-left: 40vh;
-    margin-right: 20vh;
+    
     height: 80.5vh;
     width: 125vh;
     align-items: center;
-    background-color: #c0e1ea;
+    opacity: 0.6;
+    background-color: #7fc7db;
     display: flex;
     justify-content: space-between;
+    position: fixed;
 }
+
 .rectangle1 {
     width: 57vh;
     height: 70vh;
@@ -64,34 +67,40 @@ export default {
     position: relative;
     z-index: 10;
 }
+
 .rectangle2 {
     width: 57vh;
     height: 70vh;
-    background-color:#e6f0f430;
+    background-color: #e6f0f430;
     margin-right: 5vh;
     position: relative;
     z-index: 10;
 }
+
 h1 {
     text-align: left;
     margin-left: 3vh;
 }
-.cook{
-    margin-top:8vh;
+
+.cook {
+    margin-top: 8vh;
     font-size: 6vh;
     color: #ffffffd3;
 }
+
 .cook1 {
     margin-top: 5vh;
     font-size: 6vh;
     color: #ffffffd3;
 }
-.attentions{
+
+.attentions {
     margin-top: 7vh;
     margin-left: 3vh;
     margin-bottom: 7vh;
     font-size: 3.5vh;
 }
+
 .attentions1 {
     margin-top: 2vh;
     text-align: left;

@@ -70,6 +70,6 @@ export default {
     padding: 20px;
     border-radius: 10px;
     margin-top: 100px;
-    margin-left: 450px;
+    margin-left: 300px;
 }
 </style>

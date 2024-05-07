@@ -67,9 +67,10 @@
                                 </div>
                             </template>
                             <p> <strong>空调详单:</strong>
-                                <li v-for="acbill in this.Cooldetail.acBillList" class="infinite-list-item">
+                                <div v-for="acbill in this.Cooldetail.acBillList" class="infinite-list-item" style="margin-left:13%;margin-top:10px">
+                                    
                                     <el-timeline style="max-width: 600px">
-                                        <el-timeline-item :timestamp="formatDateTime(acbill.createAt)" placement="top">
+                                        <el-timeline-item  :timestamp="formatDateTime(acbill.createAt)" placement="top">
                                             <el-card>
 
                                                 <p>单价：{{ acbill.price }} 元/分钟 </p>
@@ -81,7 +82,7 @@
                                             </el-card>
                                         </el-timeline-item>
                                     </el-timeline>
-                                </li>
+                                </div>
                             </p>
                             <p><strong>空调总价:</strong> {{ this.Cooldetail.acPrice }}</p>
 
@@ -97,21 +98,21 @@
                             </div>
                         </template>
                         <ul>
-                            <li v-for="(foodBill, index) in Fooddetail" :key="index">
+                            <div v-for="(foodBill, index) in Fooddetail" :key="index">
                                 <el-card>
                                     <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
                                     <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
                                     <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
                                     <p><strong>食物清单:</strong></p>
                                     <ul>
-                                        <li v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
+                                        <div v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
                                             <p><strong>食物：</strong>{{ food.name }}</p>
                                             <p><strong>价格：</strong>{{ food.price }}</p>
                                             <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
-                                        </li>
+                                        </div>
                                     </ul>
                                 </el-card>
-                            </li>
+                            </div>
                         </ul>
                         
                     </el-card>
@@ -392,7 +393,7 @@ export default {
     align-items: center;
     height: 100%;
     width: 80%;
-    margin: auto;
+    margin-left:100px;
 }
 .chart-container {
     display: flex;

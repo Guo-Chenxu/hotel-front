@@ -264,7 +264,6 @@ export default {
 <style scoped>
 .customer-snack {
   width: 80%;
-
   margin: 10% auto;
   margin-left: 150px;
 }

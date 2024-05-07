@@ -66,36 +66,31 @@ export default {
 
 <style scoped>
 .user-window {
+    height: 98.2vh;
     width: 100%;
-    height: 100%;
-    position:fixed;
+    
 }
 
 .header {
-    background-color: #f0f0f0;
+    
+    margin-top: 0%;
+    height: 10vh;
     display: flex;
-    align-items: center;
-    padding: 10px;
 }
 
 .title-logo {
-    margin: 0;
-    font-size: 24px;
+    margin-top: 2.2%;
 }
 
 .sidebar {
-    position:fixed;
-    height: 100%;
-    width: 10%; /* 调整侧边栏宽度 */
-    background-color: #f0f0f0;
-    display: flex;
-    flex-direction: column;
-    padding-top: 20px;
-    justify-content: center;
+    margin-top:10%;
+    
+    width: 18vh;
     
 }
 
 .sidebar-item {
+    
     padding: 15px;
     cursor: pointer;
     transition: background-color 0.3s ease; 
@@ -110,7 +105,9 @@ export default {
 }
 
 .main-content {
-    padding: 20px;
+    height: 88.5vh;
+    margin-left:0px;
+    background-color: rgb(255, 255, 255);
     
 }
 
