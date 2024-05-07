@@ -18,36 +18,50 @@
               </div>
               <div class="led-row">
                 <el-text>预期温度: </el-text>
-                <el-input-number v-model="targetTemperatureValue" controls-position="right" style=" width:100px"  @change="changeAC">
-
+                <div v-if="this.status == 0">
+                  <el-input-number v-model="targetTemperature" controls-position="right" style=" width:100px">
                 </el-input-number>
-                
+                </div>
+                <div v-if="this.status != 0">
+                <el-input-number v-model="targetTemperatureValue" controls-position="right" style=" width:100px"
+                  @change="changeAC">
+                </el-input-number>
+                </div>
                 <span>°C</span>
               </div>
               <div class="led-row">
                 <el-text>空调状态: {{ statusText }}</el-text>
               </div>
-              <div class="led-row">
-                <el-text>风速: {{ fanSpeed }}</el-text>
+              <div v-if="this.status == 0">
+                <div class="led-row">
+                  <el-text>风速: {{ fanSpeedOff }}</el-text>
+                </div>
+              </div>  
+              <div v-if="this.status != 0">
+                <div class="led-row">
+                  <el-text>风速: {{ fanSpeed }}</el-text>
+                </div>
               </div>
+              
               <div class="led-row">
                 <el-text>空调每分钟变化温度: {{ changeTmp }}</el-text>
               </div>
               <div class="led-row">
-                <el-text>当前价格: {{ price }}</el-text>
+                <el-text>空调价格: {{ price }}</el-text>
               </div>
 
             </div>
             <!-- 下半部分：调节按钮 -->
             <div class="control-buttons">
-              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn" >{{ this.status == 0 ? '开启' : '关闭'
-              }}</el-button>
 
-              <el-button @click="adjustFanSpeed">调节风速</el-button>
+              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn">{{ this.status == 0 ? '开启' : '关闭'}}</el-button>
+              <div v-if="this.status == 0">
+                <el-button @click="adjustFanSpeedOff">调节风速</el-button>
+              </div>
+              <div v-if="this.status != 0">
+                <el-button @click="adjustFanSpeed">调节风速</el-button>
+              </div>
             </div>
-
-
-
           </el-card>
 
         </div>
@@ -67,7 +81,7 @@
 <script>
 import store from '@/store';
 import axios from 'axios';
-import api from '@/api'; // 替换为实际的文件路径
+import api from '@/api';
 const baseURL = `${api.baseURL}/cool`;
 export default {
   data() {
@@ -75,6 +89,8 @@ export default {
       activeTab: 'tab1',
       changeTmp: '',
       currentTemperature: '',
+      targetTemperature: null,
+      fanSpeedOff:'',
       targetTemperatureValue: 25,
       status: '',
       fanSpeed: 1,
@@ -110,7 +126,7 @@ export default {
         this.currentTemperature = data.temperature.toFixed(2);
         this.status = data.status
         this.changeTmp = data.changeTemp != null ? data.changeTemp : ''
-        this.targetTemperatureValue = data.targetTemp != null ? data.targetTemp :''
+        this.targetTemperatureValue = data.targetTemp != null ? data.targetTemp : ''
         this.price = data.price != null ? data.price : ''
         if (data.status == 0) {
           this.fanSpeed = 0;
@@ -166,33 +182,35 @@ export default {
   },
   methods: {
     handleTabClick() {
-            this.showCoolData();
-        },
-        showCoolData() {
-            axios({
-                method: 'get',
-                url: `${baseURL}/properties`,
-                headers: {
-                    Authorization: localStorage.getItem('token')
-                }
-            }).then(response => {
-                if (response.data.code === 200) {
+      this.showCoolData();
+    },
+    showCoolData() {
+      axios({
+        method: 'get',
+        url: `${baseURL}/properties`,
+        headers: {
+          Authorization: localStorage.getItem('token')
+        }
+      }).then(response => {
+        if (response.data.code === 200) {
 
-                    this.airConditioningProperties = response.data.data
-                    console.log("获取空调属性成功");
-                } else {
-                    this.showErrorAlert = true;
-                    console.error(response.data.message);
-                }
+          this.airConditioningProperties = response.data.data
+          console.log("获取空调属性成功");
+        } else {
+          this.showErrorAlert = true;
+          console.error(response.data.message);
+        }
 
-            })
-                .catch(error => {
-                    console.error('获取空调属性失败:', error);
-                });
-        },
-    
+      })
+        .catch(error => {
+          console.error('获取空调属性失败:', error);
+        });
+    },
+
     turn() {
       if (this.status == 0) {
+        this.targetTemperatureValue = this.targetTemperature
+        this.fanSpeed = this.fanSpeedOff
         this.changeAC();
       } else if (this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4) {
         this.turnOffAC();
@@ -200,45 +218,46 @@ export default {
 
     },
     turnOffAC() {
-            console.log("处理关闭空调操作")
-            console.log("关闭");
-            axios({
-                method: 'post',
-                url: `${baseURL}/turnOff`,
-                headers: {
+      console.log("处理关闭空调操作")
+      console.log("关闭");
+      axios({
+        method: 'post',
+        url: `${baseURL}/turnOff`,
+        headers: {
 
-                    Authorization: localStorage.getItem('token')
-                },
-            }).then(response => {
-                if (response.data.code === 200) {
-
-                    console.log(response.data.message);
-                    
-                } else {
-
-                    console.error(response.data.message);
-                }
-            }).catch(error => {
-
-                console.error('HTTP 请求失败：', error.message || '未知错误');
-            });
+          Authorization: localStorage.getItem('token')
         },
+      }).then(response => {
+        if (response.data.code === 200) {
+
+          console.log(response.data.message);
+
+        } else {
+
+          console.error(response.data.message);
+        }
+      }).catch(error => {
+
+        console.error('HTTP 请求失败：', error.message || '未知错误');
+      });
+    },
     adjustFanSpeed() {
       let fanSpeed = parseInt(this.fanSpeed);
       fanSpeed = (fanSpeed < 3) ? fanSpeed + 1 : 1;
       this.fanSpeed = fanSpeed.toString();
       this.changeAC()
     },
+    adjustFanSpeedOff() {
+      let fanSpeedOff = parseInt(this.fanSpeedOff);
+      fanSpeedOff = (fanSpeedOff < 3) ? fanSpeedOff + 1 : 1;
+      this.fanSpeedOff = fanSpeedOff.toString();
+    },
+
     changeAC() {
-      var status = this.status
-      if (status != 0 && status != 4)
-        status = this.fanSpeed
-      else
-        status = this.status
-      
+
       var data = JSON.stringify({
         "targetTemperature": this.targetTemperatureValue,
-        "status": status
+        "status": this.fanSpeed
       });
       axios({
         method: 'post',
