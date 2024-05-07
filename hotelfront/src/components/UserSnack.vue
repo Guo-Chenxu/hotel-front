@@ -1,40 +1,44 @@
 <template>
   <div class="container">
+    <el-dialog ref="remarkDialog" v-model="dialogVisible" title="订餐详情">
+      <div v-for="snack in multipleSelection" :key="snack.id">
+        <div class="food-info">
+          <p>{{ snack.name }}</p>
+          <img :src="snack.img" class="snack-image" />
+        </div>
+        <div class="input-wrapper">
+          <label for="quantity">数量:</label>
+          <el-input-number v-model="snack.quantity" :min="1" :max="10"  size="small" @change="handleChange(snack)" />
+        </div>
+      </div>
+      <h3><strong>总价：</strong>{{ totalPrice }} 元</h3>
+      <div class="input-wrapper">
+        <label for="remark" style="margin-right:20px">备注: </label>
+        <div class="flex-container">
+          <el-input v-model="remark" id="remark" placeholder="添加备注"></el-input>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeRemarkDialog">取 消</el-button>
+        <el-button type="primary" @click="addMeal">确 定</el-button>
+      </div>
+    </el-dialog>
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
       <el-tab-pane label="点餐" name="tab1">
-        <el-collapse v-model="activeName" accordion>
-          <el-collapse-item v-for="(snack, index) in snacks" :key="index" :title="snack.name" :name="index.toString()">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>价格: {{ snack.price }}</div>
-              <div>图片: <img :src="snack.img" style="max-width: 100px; max-height: 100px;" /></div>
-            </div>
-
-            <div>
-              <el-button type="primary" @click="showRemarkDialog(snack)">点餐</el-button>
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-        <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next"
-          :total= this.totalItems  :page-size="this.pageSize">
-        </el-pagination>
-        <el-dialog ref="remarkDialog" v-model="dialogVisible" title="订餐详情">
-          <p v-if="currentSnack">{{ currentSnack.name }}</p>
-          <p v-if="currentSnack">价格: {{ currentSnack.price }}</p>
-          <div class="input-wrapper">
-            <label for="remark">备注: </label>
-            <div class="flex-container">
-              <el-input v-if="currentSnack" v-model="currentSnack.remark" id="remark" placeholder="添加备注"></el-input>
-            </div>
-          </div>
-          <label for="quantity">订单数量:</label>
-          <div class="input-wrapper">
-            <el-input-number v-model="currentSnack.quantity" :min="1" :max="10" @change="handleChange" />
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="closeRemarkDialog">取 消</el-button>
-            <el-button type="primary" @click="addMeal">确 定</el-button>
-          </div>
-        </el-dialog>
+        <el-table :data="snacks" style="width: 100%" @selection-change="handleSelectionChange" ref="snackTable"
+          :row-key="row => row.id" :selectable="row => !row.disabled">
+          <el-table-column type="selection" width="55" />
+          <el-table-column label="Name" prop="name" />
+          <el-table-column label="Price" prop="price" />
+          <el-table-column label="Image">
+            <template #default="scope">
+              <img :src="scope.row.img" style="max-width: 100px; max-height: 100px;" />
+            </template>
+          </el-table-column>
+        </el-table>
+        <div style="margin-top: 20px">
+          <el-button @click="showRemarkDialog()" :disabled="multipleSelection.length === 0">点餐</el-button>
+        </div>
       </el-tab-pane>
       <el-tab-pane label="查看历史订单" name="tab2" @tab-click="handleTabClick">
         <!-- 查看历史订单页面的内容 -->
@@ -54,7 +58,7 @@
                       <p><strong>总价：</strong>{{ order.totalPrice }} 元</p>
                       <p><strong>备注：</strong>{{ order.remarks }}</p>
                     </div>
-                    
+
                   </el-card>
                 </el-timeline-item>
               </el-timeline>
@@ -71,7 +75,7 @@
 
 <script>
 import axios from 'axios';
-import api from '@/api'; 
+import api from '@/api';
 const baseURL = `${api.baseURL}/food`;
 
 export default {
@@ -86,20 +90,45 @@ export default {
       dialogVisible: false,
       visibleOrders: [],
       activeName: '',
+      totalPrice: 0, 
       currentSnack: '',
+      multipleSelection: [], 
+      remark: null 
     };
   },
   mounted() {
 
     this.showSnacks();
   },
+  computed: {
+    // 计算订单总价
+    totalPrice() {
+      return this.multipleSelection.reduce((total, snack) => {
+        return total + snack.price * snack.quantity;
+      }, 0);
+    }
+  },
   methods: {
+    handleSelectionChange(selection) {
+      this.multipleSelection = selection;
+
+    },
     handleChange(value) {
       console.log(value);
     },
-    showRemarkDialog(snack) {
-      this.currentSnack = snack;
+    showRemarkDialog() {
+      // 将多选菜品的数量设置为1
+      this.multipleSelection.forEach(snack => {
+        snack.quantity = 1;
+      });
       this.dialogVisible = true;
+    },
+    closeRemarkDialog(){
+      this.dialogVisible = false;
+      this.multipleSelection = [];
+          this.remark = '';
+          // 清空表格的选项
+          this.$refs.snackTable.clearSelection();
     },
 
 
@@ -117,39 +146,41 @@ export default {
      * @return {*}
      */
     addMeal() {
+      if (this.multipleSelection.length == 0) {
+        return;
+      }
 
-      // 构造订单对象
-      var order = {
-        "order": {
-          [this.currentSnack.id]: this.currentSnack.quantity
-        },
-        "remarks": this.currentSnack.remark
+      const order = {
+        order: this.multipleSelection.reduce((acc, snack) => {
+          acc[snack.id] = snack.quantity;
+          return acc;
+        }, {}),
+        remarks: this.remark
       };
 
-
-      var data = JSON.stringify(order);
       axios({
         method: 'post',
         url: `${baseURL}/order`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: localStorage.getItem('token') // 获取存储的token
+          Authorization: localStorage.getItem('token') 
         },
-        data: data
+        data: JSON.stringify(order)
       }).then(response => {
-        console.log(response.data);
-        if (response.data.code == 200) {
+        if (response.data.code === 200) {
           this.dialogVisible = false;
           this.$message.success('点餐成功');
-          this.currentSnack.quantity = ''
-          this.currentSnack.remark = ''
+          this.multipleSelection = [];
+          this.remark = '';
+
+          // 清空表格的选项
+          this.$refs.snackTable.clearSelection();
         } else {
           console.error(response.data.message);
         }
-      })
-        .catch(error => {
-          console.error("请求失败：", error.message || "未知错误");
-        });
+      }).catch(error => {
+        console.error("请求失败：", error.message || "未知错误");
+      });
     },
     /**
      * @description: 查询历史订单
@@ -161,17 +192,17 @@ export default {
         method: 'get',
         url: `${baseURL}/history`,
         headers: {
-          Authorization: localStorage.getItem('token') // 获取存储的token
+          Authorization: localStorage.getItem('token') 
         }
       }).then(response => {
         console.log(response.data);
         if (response.data.code === 200) {
-          // 遍历每个订单条目，提取出所需信息，并存储在visibleOrders中
+
           this.visibleOrders = response.data.data.map(order => {
             const foods = [];
             for (const key in order.foods) {
               if (order.foods.hasOwnProperty(key)) {
-                // 提取食物信息字符串中的各个属性值
+
                 const [, id, name, price, img] = key.match(/id=(.*?), name=(.*?), price=(.*?), img=(.*?), deleted=(.*?)\)$/);
                 foods.push({
                   id: id,
@@ -183,8 +214,8 @@ export default {
               }
             }
             return {
-              customerName: order.customerName, // 用户姓名
-              foods: foods, // 所有食物信息
+              customerName: order.customerName, 
+              foods: foods, 
               totalPrice: order.totalPrice,
               remarks: order.remarks,
               createAt: order.createAt
@@ -197,14 +228,8 @@ export default {
         console.error("请求失败：", error.message || "未知错误");
       });
     },
-
-
-
-
-
     handleTabClick() {
       this.showHistoryOrders();
-
     },
     showSnacks() {
       axios({
@@ -228,7 +253,7 @@ export default {
     },
     handleCurrentChange(page) {
       this.currentPage = page;
-      this.page = page; // 设置当前页码
+      this.page = page; 
       this.showSnacks();
     },
 
@@ -283,8 +308,19 @@ export default {
   margin-bottom: 20px;
   justify-content: center;
 }
+
 .food-item {
-  justify-content: space-between; /* 在容器内部平均分配空间，使子元素对齐 */
+  justify-content: space-between;
+  /* 在容器内部平均分配空间，使子元素对齐 */
+}
+.snack-image {
+  max-width: 50px;
+  max-height: 50px;
+}
+.food-info {
+  display: flex;
+  align-items: center;
+  margin-left:40%
 }
 
 </style>
