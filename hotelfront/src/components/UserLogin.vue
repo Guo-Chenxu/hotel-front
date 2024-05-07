@@ -2,7 +2,7 @@
   <div class="user-login">
     <div class="rectangle1-container">
       <div class="rectangle1">
-        <h2>@ Buper</h2>
+        <h2>@ Bupter</h2>
         <img class="logo" src="../assets/1.png">
       </div>
       <div class="rectangle2">

@@ -297,7 +297,7 @@ export default {
 
 <style scoped>
 .air-conditioner-service {
-  margin-left: 150px;
+  margin-left: 200px;
   width: 80%;
   display: flex;
   flex-direction: column;
@@ -308,9 +308,8 @@ export default {
   width: 50%;
   padding: 20px;
   border-radius: 10px;
-  margin-top: 60px;
+  margin-top: 50px;
   margin-left: 250px;
-  margin-top: 13%;
 }
 
 .status-display {

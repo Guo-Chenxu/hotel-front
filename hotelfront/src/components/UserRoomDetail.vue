@@ -69,8 +69,7 @@ export default {
     width: 40%;
     padding: 20px;
     border-radius: 10px;
-    margin-top: 60px;
+    margin-top: 100px;
     margin-left: 450px;
-    margin-top: 13%;
 }
 </style>

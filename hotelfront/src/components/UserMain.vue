@@ -40,13 +40,13 @@ export default {
     color: #ffffff;
     overflow: hidden;
     height: 100vh;
-    width: 100%;
+    width: 120%;
     margin-top:-20px;
     margin-left:-6px;
     
 }
 .rectangle {
-    margin-top: -52%;
+    margin-top: -42%;
     margin-left: 40vh;
     margin-right: 20vh;
     height: 80.5vh;
