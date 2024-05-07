@@ -8,7 +8,7 @@
         </div>
         <div class="input-wrapper">
           <label for="quantity">数量:</label>
-          <el-input-number v-model="snack.quantity" :min="1" :max="10"  size="small" @change="handleChange(snack)" />
+          <el-input-number v-model="snack.quantity" :min="1" :max="10"  size="small"  />
         </div>
       </div>
       <h3><strong>总价：</strong>{{ totalPrice }} 元</h3>
@@ -36,6 +36,9 @@
             </template>
           </el-table-column>
         </el-table>
+        <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next"
+          :total= this.totalItems  :page-size="this.pageSize" style="margin-left:40%;margin-top:10px">
+        </el-pagination>
         <div style="margin-top: 20px">
           <el-button @click="showRemarkDialog()" :disabled="multipleSelection.length === 0">点餐</el-button>
         </div>
@@ -113,9 +116,11 @@ export default {
       this.multipleSelection = selection;
 
     },
-    handleChange(value) {
-      console.log(value);
-    },
+    handleCurrentChange(val) {
+            this.currentPage = val;
+            this.showSnacks();
+        },
+
     showRemarkDialog() {
       // 将多选菜品的数量设置为1
       this.multipleSelection.forEach(snack => {
