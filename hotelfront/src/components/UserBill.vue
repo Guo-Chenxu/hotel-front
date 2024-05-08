@@ -66,7 +66,7 @@
                                     <span>纳凉详单</span>
                                 </div>
                             </template>
-                            <p> <strong>空调详单:</strong>
+
                                 <div v-for="acbill in this.Cooldetail.acBillList" class="infinite-list-item" style="margin-left:13%;margin-top:10px">
                                     
                                     <el-timeline style="max-width: 600px">
@@ -78,14 +78,14 @@
                                                 <p>改变温度：{{ acbill.changeTemperature }} °C</p>
                                                 <p>此次服务时长：{{ acbill.duration }} 分钟</p>
                                                 <p>此次服务总价：{{ acbill.totalPrice }} 元</p>
-                                                <p>请求时间：{{ acbill.requestTime }} 元</p>
-                                                
+                                                <p>请求时间：{{ formatDateTime(acbill.requestTime) }} </p>
+                                                <p>服务结束时间：{{ formatDateTime(acbill.endTime) }} </p>
 
                                             </el-card>
                                         </el-timeline-item>
                                     </el-timeline>
                                 </div>
-                            </p>
+                            
                             <p><strong>空调总价:</strong> {{ this.Cooldetail.acPrice }}</p>
 
                             
@@ -99,32 +99,32 @@
                                 <span>餐饮详单</span>
                             </div>
                         </template>
-                        <ul>
-                            <div v-for="(foodBill, index) in Fooddetail" :key="index">
-                                <el-card>
-                                    <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
-                                    <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
-                                    <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
-                                    <p><strong>食物清单:</strong></p>
-                                    <ul>
-                                        <div v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
-                                            <p><strong>食物：</strong>{{ food.name }}</p>
-                                            <p><strong>价格：</strong>{{ food.price }}</p>
-                                            <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
-                                        </div>
-                                    </ul>
-                                </el-card>
+                        
+                            <div v-for="(foodBill, index) in Fooddetail" :key="index"  style="margin-left:13%;margin-top:10px">
+                                <el-timeline style="max-width: 600px">
+                                    <el-timeline-item  :timestamp="formatDateTime(foodBill.createAt)" placement="top">
+                                        <el-card>
+                                            <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
+                                            <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
+                                            <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
+                                            <p><strong>食物清单:</strong></p>
+                                            <ul>
+                                                <div v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
+                                                    <p><strong>食物：</strong>{{ food.name }}</p>
+                                                    <p><strong>价格：</strong>{{ food.price }}</p>
+                                                    <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
+                                                </div>
+                                            </ul>
+                                        </el-card>
+                                    </el-timeline-item>
+                                    
+                                </el-timeline>
+                                
                             </div>
-                        </ul>
+                        
                         
                     </el-card>
                 </div>
-
-                
-
-
-                    
-                
             </el-tab-pane>
         </el-tabs>
 

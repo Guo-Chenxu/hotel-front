@@ -53,7 +53,7 @@ export default {
                     this.room = response.data.data;
                     // 将字符串类型的温度转换为数字类型，然后保留两位小数
                 this.room.temperature = parseFloat(response.data.data.temperature).toFixed(2);
-                    
+                    this.room.indoorTemperature = parseFloat(response.data.data.indoorTemperature).toFixed(2)
                 } else {
                     console.error(response.data.message);
                 }
