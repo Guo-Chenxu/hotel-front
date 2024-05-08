@@ -3,10 +3,10 @@
         <el-tabs v-model="activeTab" type="border-card">
             <el-tab-pane label="消费图表" name="chart">
                 <div class="chart-container">
-                  <div id="pieChart"></div>
+                    <div id="pieChart"></div>
                 </div>
-              </el-tab-pane>
-              
+            </el-tab-pane>
+
             <el-tab-pane label="账单" name="summary">
                 <el-card class="control-panel" shadow="always">
                     <template #header>
@@ -14,16 +14,28 @@
                             <span>账单</span>
                         </div>
                     </template>
-                    <div>
-                        <p><strong>房间号:</strong> {{ this.bill.roomId }}</p>
-                        <p><strong>入住时间:</strong> {{ this.bill.checkInTime }}</p>
-                        <p><strong>退房时间:</strong> {{ this.bill.checkOutTime }}</p>
-                        <p><strong>截止目前总房费:</strong> {{ this.bill.roomTotPrice }}</p>
-                        <p><strong>押金:</strong> {{ this.bill.deposit }}</p>
-                        <p><strong>餐饮消费:</strong> {{ this.bill.foodBill }}</p>
-                        <p><strong>空调消费:</strong> {{ this.bill.acBill }}</p>
-                        <p><strong>扣除押金后的总价:</strong> {{ this.bill.totalPrice }}</p>
-                    </div>
+                    <el-table :data="[
+                        { label: '房间号', value: this.bill.roomId },
+                        { label: '入住时间', value: this.bill.checkInTime },
+                        { label: '退房时间', value: this.bill.checkOutTime },
+                        { label: '截止目前总房费', value: `${this.bill.roomTotPrice}元` },
+                        { label: '押金', value: `${this.bill.deposit}元` },
+                        { label: '餐饮消费', value: `${this.bill.foodBill}元` },
+                        { label: '空调消费', value: `${this.bill.acBill}元` },
+                        { label: '扣除押金后的总价', value: `${this.bill.totalPrice}元` }
+                    ]" border style="width: 350px;margin-left:36%;margin-bottom:20px">
+                        <el-table-column label="属性" width="150">
+                            <template v-slot="{ row }">
+                                <strong>{{ row.label }}</strong>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="值" width="200">
+                            <template v-slot="{ row }">
+                                {{ row.value }}
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
                     <button @click="downloadBillPdf" class="el-button el-button--default">下载账单PDF</button>
                 </el-card>
             </el-tab-pane>
@@ -38,8 +50,9 @@
                 </el-form-item>
 
                 <el-button @click="fetchDetail" round style="margin-bottom:20px">查看详单</el-button>
-                <el-button @click="downloadBillStatementPdf" class="el-button el-button--default" style="margin-bottom:20px">下载详单PDF</el-button>
-                
+                <el-button @click="downloadBillStatementPdf" class="el-button el-button--default"
+                    style="margin-bottom:20px">下载详单PDF</el-button>
+
                 <div v-if="this.ROOM">
                     <el-card class="control-panel" shadow="always">
                         <template #header>
@@ -47,50 +60,96 @@
                                 <span>住宿详单</span>
                             </div>
                         </template>
-                        <div>
-                            <p><strong>房间号:</strong> {{ this.Roomdetail.roomId }}</p>
-                            <p><strong>入住时间:</strong> {{ this.Roomdetail.checkInTime }}</p>
-                            <p><strong>退房时间:</strong> {{ this.Roomdetail.checkOutTime }}</p>
-                            <p><strong>截止目前房费:</strong> {{ this.Roomdetail.roomPrice }} 元</p>
-                            <p><strong>截止目前总房费:</strong> {{ this.Roomdetail.roomTotPrice }} 元</p>
-                            <p><strong>押金:</strong> {{ this.Roomdetail.deposit }} 元</p>
-                        </div>
-                        
+                        <el-table :data="[
+                            { label: '房间号', value: this.Roomdetail.roomId },
+                            { label: '入住时间', value: this.Roomdetail.checkInTime },
+                            { label: '退房时间', value: this.Roomdetail.checkOutTime },
+                            { label: '截止目前房费', value: `${this.Roomdetail.roomPrice} 元` },
+                            { label: '截止目前总房费', value: `${this.Roomdetail.roomTotPrice} 元` },
+                            { label: '押金', value: `${this.Roomdetail.deposit} 元` }
+                        ]" border style="width: 350px;margin-left:38%;">
+                            <el-table-column label="属性" width="150">
+                                <template v-slot="{ row }">
+                                    <strong>{{ row.label }}</strong>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="值" width="200">
+                                <template v-slot="{ row }">
+                                    {{ row.value }}
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+
                     </el-card>
                 </div>
                 <div v-if="this.COOL">
-                    
-                        <el-card class="control-panel" shadow="always">
-                            <template #header>
-                                <div class="card-header">
-                                    <span>纳凉详单</span>
-                                </div>
-                            </template>
 
-                                <div v-for="acbill in this.Cooldetail.acBillList" class="infinite-list-item" style="margin-left:13%;margin-top:10px">
-                                    
-                                    <el-timeline style="max-width: 600px">
-                                        <el-timeline-item  :timestamp="formatDateTime(acbill.createAt)" placement="top">
-                                            <el-card>
+                    <el-card class="control-panel" shadow="always">
+                        <template #header>
+                            <div class="card-header">
+                                <span>纳凉详单</span>
+                            </div>
+                        </template>
 
-                                                <p>单价：{{ acbill.price }} 元/分钟 </p>
-                                                <p>档位：{{ acbill.status }}</p>
-                                                <p>改变温度：{{ acbill.changeTemperature }} °C</p>
-                                                <p>此次服务时长：{{ acbill.duration }} 分钟</p>
-                                                <p>此次服务总价：{{ acbill.totalPrice }} 元</p>
-                                                <p>请求时间：{{ formatDateTime(acbill.requestTime) }} </p>
-                                                <p>服务结束时间：{{ formatDateTime(acbill.endTime) }} </p>
+                        <div v-for="acbill in this.Cooldetail.acBillList" class="infinite-list-item"
+                            style="margin-left:13%;margin-top:10px">
 
-                                            </el-card>
-                                        </el-timeline-item>
-                                    </el-timeline>
-                                </div>
-                            
-                            <p><strong>空调总价:</strong> {{ this.Cooldetail.acPrice }}</p>
+                            <el-timeline style="max-width: 600px">
+                                <el-timeline-item :timestamp="formatDateTime(acbill.createAt)" placement="top">
+                                    <el-card>
 
-                            
-                        </el-card>
-                    
+                                        <el-table :data="[{
+                                            label: '单价',
+                                            value: `${acbill.price} 元/分钟`
+                                        },
+                                        {
+                                            label: '档位',
+                                            value: acbill.status
+                                        },
+                                        {
+                                            label: '改变温度',
+                                            value: `${acbill.changeTemperature} °C`
+                                        },
+                                        {
+                                            label: '此次服务时长',
+                                            value: `${acbill.duration} 分钟`
+                                        },
+                                        {
+                                            label: '此次服务总价',
+                                            value: `${acbill.totalPrice} 元`
+                                        },
+                                        {
+                                            label: '请求时间',
+                                            value: formatDateTime(acbill.requestTime)
+                                        },
+                                        {
+                                            label: '服务结束时间',
+                                            value: formatDateTime(acbill.endTime)
+                                        }
+                                        ]" border style="width: 400px;margin-left:50px">
+                                            <el-table-column label="属性" width="150">
+                                                <template v-slot="{ row }">
+                                                    <strong>{{ row.label }}</strong>
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column label="值" width="250">
+                                                <template v-slot="{ row }">
+                                                    {{ row.value }}
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+
+                                    </el-card>
+                                </el-timeline-item>
+                            </el-timeline>
+                        </div>
+
+                        <p><strong>空调总价:</strong> {{ this.Cooldetail.acPrice }}</p>
+
+
+                    </el-card>
+
                 </div>
                 <div v-if="this.SNACK">
                     <el-card class="control-panel" shadow="always">
@@ -99,30 +158,48 @@
                                 <span>餐饮详单</span>
                             </div>
                         </template>
-                        
-                            <div v-for="(foodBill, index) in Fooddetail" :key="index"  style="margin-left:13%;margin-top:10px">
-                                <el-timeline style="max-width: 600px">
-                                    <el-timeline-item  :timestamp="formatDateTime(foodBill.createAt)" placement="top">
-                                        <el-card>
-                                            <p><strong>总价:</strong> {{ foodBill.totalPrice }} 元</p>
-                                            <p><strong>备注:</strong> {{ foodBill.remarks }}</p>
-                                            <p><strong>创建时间:</strong> {{ new Date(foodBill.createAt).toLocaleString() }}</p>
-                                            <p><strong>食物清单:</strong></p>
-                                            <ul>
-                                                <div v-for="(food, foodIndex) in foodBill.foods" :key="foodIndex" class="food-item">
-                                                    <p><strong>食物：</strong>{{ food.name }}</p>
-                                                    <p><strong>价格：</strong>{{ food.price }}</p>
-                                                    <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
-                                                </div>
-                                            </ul>
-                                        </el-card>
-                                    </el-timeline-item>
-                                    
-                                </el-timeline>
-                                
-                            </div>
-                        
-                        
+
+                        <div v-for="(foodBill, index) in Fooddetail" :key="index"
+                            style="margin-left:13%;margin-top:10px">
+                            <el-timeline style="max-width: 600px">
+                                <el-timeline-item :timestamp="formatDateTime(foodBill.createAt)" placement="top">
+                                    <el-card>
+                                        <el-table :data="[
+                                            { label: '总价', value: `${foodBill.totalPrice} 元` },
+                                            { label: '备注', value: foodBill.remarks },
+                                            { label: '创建时间', value: new Date(foodBill.createAt).toLocaleString() },
+                                            { label: '食物清单', value: '' } // Placeholder for nested food items
+                                        ]" border style="width: 400px;margin-left:50px">
+                                            <el-table-column prop="label" label="属性" width="150">
+                                                <template v-slot="{ row }">
+                                                    <strong>{{ row.label }}</strong>
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column prop="value" label="值" width="250">
+                                                <template v-slot="{ row }">
+                                                    <span v-if="row.label !== '食物清单'">{{ row.value }}</span>
+                                                    <div v-else>
+                                                        <div v-for="(food, foodIndex) in foodBill.foods"
+                                                            :key="foodIndex" class="food-item">
+                                                            <h3><strong>食物{{ foodIndex + 1 }}：</strong>{{ food.name }}
+                                                            </h3>
+                                                            <p>食物价格：{{ food.price }}</p>
+                                                            <p>食物图片：<img :src="food.img"
+                                                                    style="max-width: 100px; max-height: 100px;" /></p>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+
+                                    </el-card>
+                                </el-timeline-item>
+
+                            </el-timeline>
+
+                        </div>
+
+
                     </el-card>
                 </div>
             </el-tab-pane>
@@ -135,7 +212,7 @@
 <script>
 import { ROOM_TYPE, COOL_TYPE, SNACK_TYPE } from '../constants/constants';
 import axios from 'axios'
-import api from '@/api'; 
+import api from '@/api';
 const baseURL = `${api.baseURL}/bill`;
 import * as echarts from 'echarts';
 
@@ -178,12 +255,12 @@ export default {
 
     methods: {
         formatDateTime(dateTime) {
-      const date = new Date(dateTime);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
+            const date = new Date(dateTime);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
         fetchBill() {
 
             axios({
@@ -395,22 +472,40 @@ export default {
     align-items: center;
     height: 100%;
     width: 80%;
-    margin-left:100px;
+    margin-left: 100px;
 }
+
 .chart-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 70vh; 
-  }
-  
-  #pieChart {
-    width: 80%; 
+    height: 70vh;
+}
+
+.bill-content {
+    margin-left: 40%;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+#pieChart {
+    width: 80%;
     max-width: 1000px;
     height: 100%;
-  }
+}
 
-  .food-item {
-    justify-content: space-between; /* 在容器内部平均分配空间，使子元素对齐 */
-  }
+
+
+.food-list {
+    display: flex;
+    flex-wrap: wrap;
+    /* 允许在需要时折行 */
+    justify-content: center;
+    /* 从左向右对齐 */
+}
+
+.food-item {
+    margin-right: 20px;
+    /* 可选：为每个食物项目添加间距 */
+}
 </style>
