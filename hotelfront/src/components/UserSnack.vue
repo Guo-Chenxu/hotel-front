@@ -8,7 +8,7 @@
         </div>
         <div class="input-wrapper">
           <label for="quantity">数量:</label>
-          <el-input-number v-model="snack.quantity" :min="1" :max="10"  size="small"  />
+          <el-input-number v-model="snack.quantity" :min="1" :max="10" size="small" />
         </div>
       </div>
       <h3><strong>总价：</strong>{{ totalPrice }} 元</h3>
@@ -37,7 +37,7 @@
           </el-table-column>
         </el-table>
         <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next"
-          :total= this.totalItems  :page-size="this.pageSize" style="margin-left:40%;margin-top:10px">
+          :total=this.totalItems :page-size="this.pageSize" style="margin-left:40%;margin-top:10px">
         </el-pagination>
         <div style="margin-top: 20px">
           <el-button @click="showRemarkDialog()" :disabled="multipleSelection.length === 0">点餐</el-button>
@@ -46,21 +46,39 @@
       <el-tab-pane label="查看历史订单" name="tab2" @tab-click="handleTabClick">
         <!-- 查看历史订单页面的内容 -->
         <div class="history">
-          <ul class="infinite-list" style="overflow: auto;height:400px">
+          <ul class="infinite-list" style="overflow: auto;height:100%">
             <li v-for="order in visibleOrders" class="infinite-list-item">
               <el-timeline style="max-width: 600px">
                 <el-timeline-item :timestamp="formatDateTime(order.createAt)" placement="top">
                   <el-card>
 
-                    <div>
-                      <div v-for="(food, index) in order.foods" :key="index" class="food-item">
-                        <p><strong>食物：</strong>{{ food.name }}</p>
-                        <p><strong>价格：</strong>{{ food.price }}</p>
-                        <p><strong>图片：</strong><img :src="food.img" style="max-width: 100px; max-height: 100px;" /></p>
-                      </div>
-                      <p><strong>总价：</strong>{{ order.totalPrice }} 元</p>
-                      <p><strong>备注：</strong>{{ order.remarks }}</p>
-                    </div>
+                    <el-table :data="[
+                      { label: '食物', value: order.foods },
+                      { label: '总价', value: `${order.totalPrice} 元` },
+                      { label: '备注', value: order.remarks }
+                    ]" border style="width: 400px; margin-left: 50px">
+                      <el-table-column prop="label" label="属性" width="150">
+                        <template v-slot="{ row }">
+                          <strong>{{ row.label }}</strong>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="value" label="值" width="250">
+                        <template v-slot="{ row }">
+                          <template v-if="row.label === '食物'">
+                            <div v-for="(food, index) in row.value" :key="index" class="food-item">
+                              <p><strong>食物：</strong>{{ food.name }}</p>
+                              <p><strong>价格：</strong>{{ food.price }}</p>
+                              <p><strong>图片：</strong><img :src="food.img"
+                                  style="max-width: 100px; max-height: 100px;" /></p>
+                            </div>
+                          </template>
+                          <template v-else>
+                            <span>{{ row.value }}</span>
+                          </template>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+
 
                   </el-card>
                 </el-timeline-item>
@@ -93,10 +111,10 @@ export default {
       dialogVisible: false,
       visibleOrders: [],
       activeName: '',
-      totalPrice: 0, 
+      totalPrice: 0,
       currentSnack: '',
-      multipleSelection: [], 
-      remark: null 
+      multipleSelection: [],
+      remark: null
     };
   },
   mounted() {
@@ -117,9 +135,9 @@ export default {
 
     },
     handleCurrentChange(val) {
-            this.currentPage = val;
-            this.showSnacks();
-        },
+      this.currentPage = val;
+      this.showSnacks();
+    },
 
     showRemarkDialog() {
       // 将多选菜品的数量设置为1
@@ -128,12 +146,12 @@ export default {
       });
       this.dialogVisible = true;
     },
-    closeRemarkDialog(){
+    closeRemarkDialog() {
       this.dialogVisible = false;
       this.multipleSelection = [];
-          this.remark = '';
-          // 清空表格的选项
-          this.$refs.snackTable.clearSelection();
+      this.remark = '';
+      // 清空表格的选项
+      this.$refs.snackTable.clearSelection();
     },
 
 
@@ -168,7 +186,7 @@ export default {
         url: `${baseURL}/order`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: localStorage.getItem('token') 
+          Authorization: localStorage.getItem('token')
         },
         data: JSON.stringify(order)
       }).then(response => {
@@ -197,7 +215,7 @@ export default {
         method: 'get',
         url: `${baseURL}/history`,
         headers: {
-          Authorization: localStorage.getItem('token') 
+          Authorization: localStorage.getItem('token')
         }
       }).then(response => {
         console.log(response.data);
@@ -219,8 +237,8 @@ export default {
               }
             }
             return {
-              customerName: order.customerName, 
-              foods: foods, 
+              customerName: order.customerName,
+              foods: foods,
               totalPrice: order.totalPrice,
               remarks: order.remarks,
               createAt: order.createAt
@@ -258,7 +276,7 @@ export default {
     },
     handleCurrentChange(page) {
       this.currentPage = page;
-      this.page = page; 
+      this.page = page;
       this.showSnacks();
     },
 
@@ -317,14 +335,15 @@ export default {
   justify-content: space-between;
   /* 在容器内部平均分配空间，使子元素对齐 */
 }
+
 .snack-image {
   max-width: 50px;
   max-height: 50px;
 }
+
 .food-info {
   display: flex;
   align-items: center;
-  margin-left:40%
+  margin-left: 40%
 }
-
 </style>
