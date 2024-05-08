@@ -9,6 +9,7 @@
             <p><strong>退房时间:</strong> {{ room.leaveTime }}</p>
             <p><strong>房间号:</strong> {{ room.roomId }}</p>
             <p><strong>价格:</strong> {{ room.price }}</p>
+            <p><strong>房间默认温度:</strong> {{ room.indoorTemperature }}</p>
             <p><strong>温度:</strong> {{ room.temperature }}</p>
             <h6>[此项温度不为实时温度, 实时温度请查看空调页面]</h6>
         </div>

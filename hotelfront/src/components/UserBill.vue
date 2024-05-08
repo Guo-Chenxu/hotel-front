@@ -78,6 +78,8 @@
                                                 <p>改变温度：{{ acbill.changeTemperature }} °C</p>
                                                 <p>此次服务时长：{{ acbill.duration }} 分钟</p>
                                                 <p>此次服务总价：{{ acbill.totalPrice }} 元</p>
+                                                <p>请求时间：{{ acbill.requestTime }} 元</p>
+                                                
 
                                             </el-card>
                                         </el-timeline-item>
