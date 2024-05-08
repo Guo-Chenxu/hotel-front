@@ -11,7 +11,7 @@
           <el-input-number v-model="snack.quantity" :min="1" :max="10" size="small" />
         </div>
       </div>
-      <h3><strong>总价：</strong>{{ totalPrice }} 元</h3>
+      <h3><strong>总价：</strong>{{ caltotalPrice }} 元</h3>
       <div class="input-wrapper">
         <label for="remark" style="margin-right:20px">备注: </label>
         <div class="flex-container">
@@ -123,7 +123,7 @@ export default {
   },
   computed: {
     // 计算订单总价
-    totalPrice() {
+    caltotalPrice() {
       return this.multipleSelection.reduce((total, snack) => {
         return total + snack.price * snack.quantity;
       }, 0);

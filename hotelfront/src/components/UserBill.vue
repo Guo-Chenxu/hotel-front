@@ -303,7 +303,7 @@ export default {
                 // 注意：需要根据实际返回的数据结构进行修改
                 this.Roomdetail = response.data.data;
                 this.Cooldetail = response.data.data;
-                this.Fooddetail = response.data.data.foodBillList.map(foodBill => {
+                this.Fooddetail = response.data.data.foodBillList ? response.data.data.foodBillList.map(foodBill => {
                     var foods = [];
                     for (const [foodStr] of Object.entries(foodBill.foods)) {
                         const food = JSON.parse(foodStr);
@@ -322,7 +322,8 @@ export default {
                         remarks: foodBill.remarks,
                         createAt: foodBill.createAt
                     };
-                })
+                }) : [];
+
 
             })
                 .catch(error => {
@@ -351,7 +352,10 @@ export default {
         },
         drawPieChart() {
 
-            const pieChart = echarts.init(document.getElementById('pieChart'));
+            const pieChartContainer = document.getElementById('pieChart');
+
+            echarts.dispose(pieChartContainer);
+            const pieChart = echarts.init(pieChartContainer);
 
             const option = {
                 title: {

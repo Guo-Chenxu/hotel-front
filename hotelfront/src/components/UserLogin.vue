@@ -38,6 +38,7 @@ export default {
   name: 'UserLogin',
   data() {
     return {
+      isLogin:false,
       username: '',
       roomId: '',
       isLoggedIn: false,
@@ -57,8 +58,9 @@ export default {
             localStorage.setItem('roomId', response.data.data.room);
             localStorage.setItem('userId', response.data.data.customerId);
             this.$router.push('/home');
-            
-            // 监控空调
+            this.isLogin = true;
+            if(this.isLogin) {
+              // 监控空调
             axios({
               method: 'get',
               url: `${api.baseURL}/cool/watchAC`,
@@ -75,6 +77,8 @@ export default {
             }).catch(error => {
               console.error("请求失败：", error.message || "未知错误");
             });
+            }
+            
             // this.initWebSocket();
           } else {
             console.error("error:" + response.data.message);
