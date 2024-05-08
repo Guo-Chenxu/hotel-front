@@ -67,7 +67,7 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="查看空调参数" name="tab2">
-        <el-table :data="tableData" style="width: 100%;margin-left:30%;margin-top:10%">
+        <el-table :data="tableData" style="width: 100%;margin-left:25%;margin-top:8%">
           <el-table-column prop="parameter" label="参数" width="200"></el-table-column>
           <el-table-column prop="value" label="值" width="200"></el-table-column>
           <el-table-column align="right">

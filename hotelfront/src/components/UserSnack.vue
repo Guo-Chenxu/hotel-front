@@ -288,7 +288,7 @@ export default {
 .customer-snack {
   width: 80%;
   margin: 10% auto;
-  margin-left: 150px;
+  margin-left: 60px;
 }
 
 .history {
@@ -299,7 +299,6 @@ export default {
 .infinite-list {
   height: 300px;
   padding: 0;
-  margin: 0;
   list-style: none;
 }
 

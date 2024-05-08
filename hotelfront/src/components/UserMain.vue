@@ -52,8 +52,8 @@ export default {
     height: 80.5vh;
     width: 125vh;
     align-items: center;
-    opacity: 0.6;
-    background-color: #7fc7db;
+    
+    background-color: #86c5d67e;
     display: flex;
     justify-content: space-between;
     position: fixed;
