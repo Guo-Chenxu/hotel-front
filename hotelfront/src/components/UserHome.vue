@@ -32,7 +32,7 @@
 import { ElIcon } from 'element-plus';
 import { Timer } from '@element-plus/icons';
 
-import main from './UserMain.vue';
+import Main from './UserMain.vue';
 import cool from './UserCool.vue';
 import snack from './UserSnack.vue';
 import login from './UserLogin.vue';
@@ -44,7 +44,7 @@ const timerURL = `${api.timerURL}`;
 
 export default {
 
-    name: 'UserWindow',
+   
     components: {
         Timer
     },
@@ -55,7 +55,7 @@ export default {
         return {
             currentTime: '',
             sidebarItems: [
-                { name: '主页', component: 'main' },
+                { name: '主页', component: 'Main' },
                 { name: '房间详情', component: 'detail' },
                 { name: '纳凉服务', component: 'cool' },
                 { name: '进行点餐', component: 'snack' },
@@ -89,7 +89,7 @@ export default {
     },
 
     components: {
-        main,
+        Main,
         cool,
         snack,
         login,
