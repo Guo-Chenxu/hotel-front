@@ -1,8 +1,15 @@
 <template>
     <div class="user-window">
         <el-container>
-            <el-header class='header'>
-                <h1 class="title-logo">@BUPTER</h1>
+
+            <el-header class="header">
+                <div class="header-content">
+                    <h1 class="title-logo">@BUPTER</h1>
+                </div>
+                <el-icon class="timer-icon" size="large">
+                    <Timer />
+                </el-icon>
+                <span class="time">{{ this.currentTime }}</span>
             </el-header>
             <el-container>
                 <el-aside class="sidebar">
@@ -16,29 +23,44 @@
                 </el-main>
             </el-container>
         </el-container>
-        
+
     </div>
 </template>
 
 
 <script>
+import { ElIcon } from 'element-plus';
+import { Timer } from '@element-plus/icons';
+
 import main from './UserMain.vue';
 import cool from './UserCool.vue';
 import snack from './UserSnack.vue';
 import login from './UserLogin.vue';
 import detail from './UserRoomDetail.vue';
 import bill from './UserBill.vue';
+
+import api from '@/api';
+const timerURL = `${api.timerURL}`;
+
 export default {
+
     name: 'UserWindow',
+    components: {
+        Timer
+    },
+    mounted() {
+        this.getTimer()
+    },
     data() {
         return {
+            currentTime: '',
             sidebarItems: [
                 { name: '主页', component: 'main' },
                 { name: '房间详情', component: 'detail' },
                 { name: '纳凉服务', component: 'cool' },
                 { name: '进行点餐', component: 'snack' },
                 { name: '账单', component: 'bill' },
-                
+
             ],
             currentPage: 0
         };
@@ -49,10 +71,23 @@ export default {
         }
     },
     methods: {
+        getTimer() {
+            let source = new EventSource(
+                `${timerURL}/timer/now`);
+
+            // 使用箭头函数来保持正确的上下文
+            source.onmessage = (e) => {
+                this.currentTime = e.data;
+                //console.log(e.data);
+                //console.log("time"+this.currentTime)
+            };
+        },
         showPage(index) {
             this.currentPage = index;
-        }
+        },
+
     },
+
     components: {
         main,
         cool,
@@ -68,11 +103,11 @@ export default {
 .user-window {
     height: 98.2vh;
     width: 100%;
-    
+
 }
 
 .header {
-    
+
     margin-top: 0%;
     height: 10vh;
     display: flex;
@@ -83,21 +118,22 @@ export default {
 }
 
 .sidebar {
-    margin-top:10%;
-    
+    margin-top: 10%;
+
     width: 18vh;
-    
+
 }
 
 .sidebar-item {
-    
+
     padding: 15px;
     cursor: pointer;
-    transition: background-color 0.3s ease; 
+    transition: background-color 0.3s ease;
 }
 
 .sidebar-item:hover {
-    background-color: #eaeaea; /* 鼠标悬停时的背景色 */
+    background-color: #eaeaea;
+    /* 鼠标悬停时的背景色 */
 }
 
 .sidebar-item.active {
@@ -106,9 +142,9 @@ export default {
 
 .main-content {
     height: 88.5vh;
-    margin-left:0px;
+    margin-left: 0px;
     background-color: rgb(255, 255, 255);
-    
+
 }
 
 /* 标题样式 */
@@ -118,5 +154,16 @@ h1 {
     padding: 10px;
 }
 
-</style>
+.timer-icon {
+    margin-top:10px;
+    margin-left:800px;
+    margin-right: 10px;
+    /* Add space between icon and time */
+}
 
+.time {
+    margin-top:10px;
+    font-size: 18px;
+    /* Adjust font size */
+}
+</style>

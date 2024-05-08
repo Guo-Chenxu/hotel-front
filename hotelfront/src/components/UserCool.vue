@@ -119,6 +119,7 @@ export default {
     }
   },
   mounted() {
+
     const ws = store.state.websocket
     if (ws) {
       ws.onmessage = (event) => {
