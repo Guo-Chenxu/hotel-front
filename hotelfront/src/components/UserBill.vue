@@ -331,8 +331,6 @@ export default {
                 });
         },
         fetchRoomBill() {
-            console.log("fecthRoom")
-
             axios({
                 method: 'get',
                 url: `${baseURL}/billStatement?type=${1}`,
@@ -340,7 +338,6 @@ export default {
                     Authorization: localStorage.getItem('token')
                 },
             }).then(response => {
-                console.log(response.data.data)
                 if (response.data.code === 200) {
                     this.Roomdetail = response.data.data;
                 } else {
@@ -412,8 +409,6 @@ export default {
                 },
                 responseType: 'blob'
             }).then(response => {
-
-                console.log(response)
                 // 创建一个临时的下载链接
                 const url = window.URL.createObjectURL(new Blob([response.data]));
 
@@ -427,6 +422,8 @@ export default {
 
                 // 清理临时链接
                 window.URL.revokeObjectURL(url);
+
+                this.$message.success("下载账单成功")
 
             }).catch(error => {
                 console.error("请求失败：", error.message || "未知错误");
@@ -458,6 +455,9 @@ export default {
 
                     // 清理临时链接
                     window.URL.revokeObjectURL(url);
+
+                    this.$message.success("下载详单成功")
+
                 }).catch(error => {
                     console.error("请求失败：", error.message || "未知错误");
                 });

@@ -78,8 +78,6 @@ export default {
             // 使用箭头函数来保持正确的上下文
             source.onmessage = (e) => {
                 this.currentTime = e.data;
-                //console.log(e.data);
-                //console.log("time"+this.currentTime)
             };
         },
         showPage(index) {

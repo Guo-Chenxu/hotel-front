@@ -210,7 +210,6 @@ export default {
      * @return {*}
      */
     showHistoryOrders() {
-      console.log("token:" + localStorage.getItem('token'));
       axios({
         method: 'get',
         url: `${baseURL}/history`,
@@ -218,7 +217,6 @@ export default {
           Authorization: localStorage.getItem('token')
         }
       }).then(response => {
-        console.log(response.data);
         if (response.data.code === 200) {
 
           this.visibleOrders = response.data.data.map(order => {
@@ -262,7 +260,6 @@ export default {
           Authorization: localStorage.getItem('token')
         }
       }).then(response => {
-        console.log(response.data);
         if (response.data.code === 200) {
           this.snacks = response.data.data.records;
           this.totalItems = response.data.data.total;

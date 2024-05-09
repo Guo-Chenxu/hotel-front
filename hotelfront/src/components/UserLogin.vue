@@ -69,7 +69,6 @@ export default {
               },
             }).then(response => {
               if (response.data.code === 200) {
-                console.log("watchAC success")
                 this.setupWebSocket();
               } else {
                 console.error(response.data.message);
@@ -93,25 +92,8 @@ export default {
 
       ws.onopen = () => {
         console.log('WebSocket connected');
-        // const ws = new WebSocket(wsURL);
-        //localStorage.setItem('WebSocket', ws)
-      // Store WebSocket instance in Vuex
         store.dispatch('setWebSocket', ws);
       };
-
-      // ws.onmessage = (event) => {
-      //   //console.log('Received message:', event.data); // 打印消息到控制台
-      //   //const data = JSON.parse(event.data);
-      // //   const ws = new WebSocket(wsURL);
-      
-      // // // Store WebSocket instance in Vuex
-      // // this.$store.dispatch('setWebSocket', ws);
-        
-        
-      //   // this.currentTemperature = data.toFixed(2);
-
-      // };
-
     },
   },
 }

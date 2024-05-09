@@ -121,9 +121,9 @@ export default {
   mounted() {
 
     const ws = store.state.websocket
-    console.log(ws)
+
     if (ws) {
-      //console.log("111")
+      
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         this.currentTemperature = data.temperature.toFixed(2);
@@ -198,7 +198,6 @@ export default {
         if (response.data.code === 200) {
 
           this.airConditioningProperties = response.data.data
-          console.log("获取空调属性成功");
         } else {
           this.showErrorAlert = true;
           console.error(response.data.message);
@@ -221,8 +220,6 @@ export default {
 
     },
     turnOffAC() {
-      console.log("处理关闭空调操作")
-      console.log("关闭");
       axios({
         method: 'post',
         url: `${baseURL}/turnOff`,
@@ -233,14 +230,12 @@ export default {
       }).then(response => {
         if (response.data.code === 200) {
 
-          console.log(response.data.message);
+          this.$message.success("关闭空调成功")
 
         } else {
-
-          console.error(response.data.message);
+          this.$message.error(response.data.message)
         }
       }).catch(error => {
-
         console.error('HTTP 请求失败：', error.message || '未知错误');
       });
     },
@@ -272,9 +267,9 @@ export default {
         data: data
       }).then(response => {
         if (response.data.code === 200) {
-          console.log(response.data.message)
+          this.$message.success("调节空调成功")
         } else {
-          console.error(response.data.message);
+          this.$message.error(response.data.message);
         }
       }).catch(error => {
         console.error("请求失败：", error.message || "未知错误");
