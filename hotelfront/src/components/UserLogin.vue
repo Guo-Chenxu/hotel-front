@@ -29,9 +29,8 @@
 
 
 <script>
-import store from '@/store';
+
 import axios from 'axios';
-const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 import api from '@/api'; 
 const baseURL = `${api.baseURL}/customer/login`;
 export default {
@@ -68,9 +67,7 @@ export default {
                 Authorization: localStorage.getItem('token')
               },
             }).then(response => {
-              if (response.data.code === 200) {
-                this.setupWebSocket();
-              } else {
+              if (response.data.code != 200) {
                 console.error(response.data.message);
               }
             }).catch(error => {
@@ -78,7 +75,6 @@ export default {
             });
             }
             
-            // this.initWebSocket();
           } else {
             console.error("error:" + response.data.message);
           }
@@ -86,14 +82,6 @@ export default {
           console.error("请求失败：", error.message || "未知错误");
         });
       }
-    },
-    setupWebSocket() {
-      const ws = new WebSocket(wsURL);
-
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-        store.dispatch('setWebSocket', ws);
-      };
     },
   },
 }

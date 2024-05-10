@@ -29,9 +29,10 @@
 
 
 <script>
+const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 import { ElIcon } from 'element-plus';
 import { Timer } from '@element-plus/icons';
-
+import store from '@/store';
 import Main from './UserMain.vue';
 import cool from './UserCool.vue';
 import snack from './UserSnack.vue';
@@ -44,12 +45,13 @@ const timerURL = `${api.timerURL}`;
 
 export default {
 
-   
+
     components: {
         Timer
     },
     mounted() {
         this.getTimer()
+        this.setupWebSocket();
     },
     data() {
         return {
@@ -71,6 +73,14 @@ export default {
         }
     },
     methods: {
+        setupWebSocket() {
+            const ws = new WebSocket(wsURL);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                store.dispatch('setWebSocket', ws);
+            };
+        },
         getTimer() {
             let source = new EventSource(
                 `${timerURL}/timer/now`);
@@ -153,14 +163,14 @@ h1 {
 }
 
 .timer-icon {
-    margin-top:10px;
-    margin-left:800px;
+    margin-top: 10px;
+    margin-left: 800px;
     margin-right: 10px;
     /* Add space between icon and time */
 }
 
 .time {
-    margin-top:10px;
+    margin-top: 10px;
     font-size: 18px;
     /* Adjust font size */
 }
