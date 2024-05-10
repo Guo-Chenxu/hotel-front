@@ -96,7 +96,7 @@
                             style="margin-left:13%;margin-top:10px">
 
                             <el-timeline style="max-width: 600px">
-                                <el-timeline-item :timestamp="formatDateTime(acbill.createAt)" placement="top">
+                                <el-timeline-item :timestamp="acbill.createAt" placement="top">
                                     <el-card>
 
                                         <el-table :data="[{
@@ -105,7 +105,7 @@
                                         },
                                         {
                                             label: '档位',
-                                            value: acbill.status
+                                            value: statusText(acbill.status),
                                         },
                                         {
                                             label: '改变温度',
@@ -121,11 +121,11 @@
                                         },
                                         {
                                             label: '请求时间',
-                                            value: formatDateTime(acbill.requestTime)
+                                            value: acbill.requestTime
                                         },
                                         {
                                             label: '服务结束时间',
-                                            value: formatDateTime(acbill.endTime)
+                                            value: acbill.endTime
                                         }
                                         ]" border style="width: 400px;margin-left:50px">
                                             <el-table-column label="属性" width="150">
@@ -162,7 +162,7 @@
                         <div v-for="(foodBill, index) in Fooddetail" :key="index"
                             style="margin-left:13%;margin-top:10px">
                             <el-timeline style="max-width: 600px">
-                                <el-timeline-item :timestamp="formatDateTime(foodBill.createAt)" placement="top">
+                                <el-timeline-item :timestamp="foodBill.createAt" placement="top">
                                     <el-card>
                                         <el-table :data="[
                                             { label: '总价', value: `${foodBill.totalPrice} 元` },
@@ -252,15 +252,21 @@ export default {
             deep: true
         }
     },
-
     methods: {
-        formatDateTime(dateTime) {
-            const date = new Date(dateTime);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+
+        statusText(status) {
+            switch (status) {
+                case 1:
+                    return '低';
+                case 2:
+                    return '中';
+                case 3:
+                    return '高';
+                default:
+                    return '';
+            }
         },
+
         fetchBill() {
 
             axios({
