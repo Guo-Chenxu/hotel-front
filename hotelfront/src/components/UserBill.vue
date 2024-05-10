@@ -146,8 +146,6 @@
                         </div>
 
                         <p><strong>空调总价:</strong> {{ this.Cooldetail.acPrice }}</p>
-
-
                     </el-card>
 
                 </div>
@@ -199,7 +197,7 @@
 
                         </div>
 
-
+                        <p><strong>餐饮总价:</strong> {{ this.foodPrice }}</p>
                     </el-card>
                 </div>
             </el-tab-pane>
@@ -219,6 +217,7 @@ import * as echarts from 'echarts';
 export default {
     data() {
         return {
+            foodPrice:'',
             ROOM: false,
             COOL: false,
             SNACK: false,
@@ -329,7 +328,7 @@ export default {
                         createAt: foodBill.createAt
                     };
                 }) : [];
-
+                this.foodPrice = response.data.data.foodPrice;
 
             })
                 .catch(error => {
