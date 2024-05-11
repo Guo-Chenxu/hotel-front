@@ -74,10 +74,10 @@ export default {
     },
     methods: {
         setupWebSocket() {
+            
             const ws = new WebSocket(wsURL);
 
             ws.onopen = () => {
-                console.log('WebSocket connected');
                 store.dispatch('setWebSocket', ws);
             };
         },

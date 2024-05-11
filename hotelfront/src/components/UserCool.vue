@@ -20,12 +20,12 @@
                 <el-text>预期温度: </el-text>
                 <div v-if="this.status == 0">
                   <el-input-number v-model="targetTemperature" controls-position="right" style=" width:100px">
-                </el-input-number>
+                  </el-input-number>
                 </div>
                 <div v-if="this.status != 0">
-                <el-input-number v-model="targetTemperatureValue" controls-position="right" style=" width:100px"
-                  @change="changeAC">
-                </el-input-number>
+                  <el-input-number v-model="targetTemperatureValue" controls-position="right" style=" width:100px"
+                    @change="changeAC">
+                  </el-input-number>
                 </div>
                 <span>°C</span>
               </div>
@@ -36,13 +36,13 @@
                 <div class="led-row">
                   <el-text>风速: {{ fanSpeedOff }}</el-text>
                 </div>
-              </div>  
+              </div>
               <div v-if="this.status != 0">
                 <div class="led-row">
                   <el-text>风速: {{ fanSpeed }}</el-text>
                 </div>
               </div>
-              
+
               <div class="led-row">
                 <el-text>空调每分钟变化温度: {{ changeTmp }}</el-text>
               </div>
@@ -54,7 +54,8 @@
             <!-- 下半部分：调节按钮 -->
             <div class="control-buttons">
 
-              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn">{{ this.status == 0 ? '开启' : '关闭'}}</el-button>
+              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn">{{ this.status == 0 ? '开启' :
+                '关闭' }}</el-button>
               <div v-if="this.status == 0">
                 <el-button @click="adjustFanSpeedOff">调节风速</el-button>
               </div>
@@ -83,6 +84,9 @@ import store from '@/store';
 import axios from 'axios';
 import api from '@/api';
 const baseURL = `${api.baseURL}/cool`;
+let reconnectTimer = null;
+let isConnected = false;
+const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/1781186036103704578`;
 export default {
   data() {
     return {
@@ -90,7 +94,7 @@ export default {
       changeTmp: '',
       currentTemperature: '',
       targetTemperature: null,
-      fanSpeedOff:'',
+      fanSpeedOff: '',
       targetTemperatureValue: 25,
       status: '',
       fanSpeed: 1,
@@ -120,35 +124,7 @@ export default {
   },
   mounted() {
 
-    const ws = store.state.websocket
-
-    if (ws) {
-      
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        this.currentTemperature = data.temperature.toFixed(2);
-        this.status = data.status
-        this.changeTmp = data.changeTemp != null ? data.changeTemp : ''
-        this.targetTemperatureValue = data.targetTemp != null ? data.targetTemp : ''
-        this.price = data.price != null ? data.price : ''
-        if (data.status == 0) {
-          this.fanSpeed = 0;
-          this.statusText = "关闭";
-        } else if (data.status == 1) {
-          this.fanSpeed = 1;
-          this.statusText = "低速";
-        } else if (data.status == 2) {
-          this.fanSpeed = 2;
-          this.statusText = "中速";
-        } else if (data.status == 3) {
-          this.fanSpeed = 3;
-          this.statusText = "高速";
-        } else if (data.status == 4) {
-          this.fanSpeed = 0;
-          this.statusText = "等待";
-        }
-      };
-    }
+    this.setupWebSocket();
   },
 
   computed: {
@@ -184,6 +160,86 @@ export default {
     }
   },
   methods: {
+    setupWebSocket() {
+      const ws = store.state.websocket;
+      this.setupReconnectTimer();
+      ws.onmessage = (event) => {
+        isConnected = true;
+        this.resetReconnectTimer();
+        this.handleWebSocketMessage(event);
+      }
+      ws.onopen = () => {
+        this.setupReconnectTimer();
+      }
+      ws.onclose = () => {
+        isConnected = false;
+        this.reconnectWebSocket();
+      }
+    },
+
+    resetReconnectTimer() {
+      clearTimeout(reconnectTimer);
+    },
+
+    setupReconnectTimer() {
+      if (!isConnected) {
+        reconnectTimer = setTimeout(() => {
+          this.reconnectWebSocket();
+          console.log("reset");
+        }, 2000);
+      }
+    },
+
+    reconnectWebSocket() {
+      if (!isConnected) {
+        const newWs = new WebSocket(wsURL);
+        this.setupReconnectTimer();
+        newWs.onopen = () => {
+          store.dispatch('setWebSocket', newWs);
+          //this.setupWebSocket();
+        };
+        newWs.onmessage = (event) => {
+          isConnected = true;
+          this.resetReconnectTimer();
+          this.handleWebSocketMessage(event);
+        };
+        
+      }
+    },
+
+    handleWebSocketMessage(event) {
+      const data = JSON.parse(event.data);
+      this.currentTemperature = data.temperature.toFixed(2);
+      this.status = data.status;
+      this.changeTmp = data.changeTemp != null ? data.changeTemp : '';
+      this.targetTemperatureValue = data.targetTemp != null ? data.targetTemp : '';
+      this.price = data.price != null ? data.price : '';
+      switch (data.status) {
+        case 0:
+          this.fanSpeed = 0;
+          this.statusText = "关闭";
+          break;
+        case 1:
+          this.fanSpeed = 1;
+          this.statusText = "低速";
+          break;
+        case 2:
+          this.fanSpeed = 2;
+          this.statusText = "中速";
+          break;
+        case 3:
+          this.fanSpeed = 3;
+          this.statusText = "高速";
+          break;
+        case 4:
+          this.fanSpeed = 0;
+          this.statusText = "等待";
+          break;
+        default:
+          break;
+      }
+    },
+
     handleTabClick() {
       this.showCoolData();
     },
@@ -295,7 +351,7 @@ export default {
 
 <style scoped>
 .air-conditioner-service {
-  
+
   margin-left: 60px;
   width: 80%;
   display: flex;

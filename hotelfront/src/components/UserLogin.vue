@@ -42,9 +42,9 @@ export default {
       roomId: '',
       isLoggedIn: false,
       token: null,
-      ws: null // WebSocket instance
     }
   },
+
   methods: {
     login() {
       if (this.username !== '' && this.roomId !== '') {
@@ -53,6 +53,7 @@ export default {
           url: `${baseURL}?name=${this.username}&room=${this.roomId}`,
         }).then(response => {
           if (response.data.code == 200) {
+            
             localStorage.setItem('token', response.data.data.token);
             localStorage.setItem('roomId', response.data.data.room);
             localStorage.setItem('userId', response.data.data.customerId);
