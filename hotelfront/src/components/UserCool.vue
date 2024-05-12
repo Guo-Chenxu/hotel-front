@@ -131,8 +131,7 @@ export default {
     
 
     tableData() {
-      
-      let modeText = this.airConditioningProperties.mode == -1 ? "制冷" : "制热";
+      let modeText = this.airConditioningProperties.mode == 0 ? "制冷" : "制热";
       return [
         { parameter: '空调模式', value: modeText },
         { parameter: '空调台数', value: this.airConditioningProperties.count },
@@ -172,13 +171,6 @@ export default {
         this.resetReconnectTimer();
         this.handleWebSocketMessage(event);
       }
-      ws.onopen = () => {
-        this.setupReconnectTimer();
-      }
-      ws.onclose = () => {
-        isConnected = false;
-        this.reconnectWebSocket();
-      }
     },
 
     resetReconnectTimer() {
@@ -189,13 +181,13 @@ export default {
       if (!isConnected) {
         reconnectTimer = setTimeout(() => {
           this.reconnectWebSocket();
-          console.log("reset");
+          console.log("off");
         }, 2000);
       }
     },
 
     reconnectWebSocket() {
-      if (!isConnected) {
+      //if (!isConnected) {
         const newWs = new WebSocket(wsURL);
         this.setupReconnectTimer();
         newWs.onopen = () => {
@@ -203,12 +195,12 @@ export default {
           //this.setupWebSocket();
         };
         newWs.onmessage = (event) => {
-          isConnected = true;
+          //isConnected = true;
           this.resetReconnectTimer();
           this.handleWebSocketMessage(event);
         };
         
-      }
+      //}
     },
 
     handleWebSocketMessage(event) {
