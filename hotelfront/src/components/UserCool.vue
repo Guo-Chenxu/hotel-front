@@ -131,7 +131,8 @@ export default {
     
 
     tableData() {
-      let modeText = this.mode == -1 ? "制冷" : "制热";
+      
+      let modeText = this.airConditioningProperties.mode == -1 ? "制冷" : "制热";
       return [
         { parameter: '空调模式', value: modeText },
         { parameter: '空调台数', value: this.airConditioningProperties.count },
