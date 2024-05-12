@@ -86,7 +86,7 @@ import api from '@/api';
 const baseURL = `${api.baseURL}/cool`;
 let reconnectTimer = null;
 let isConnected = false;
-const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/1781186036103704578`;
+const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 export default {
   data() {
     return {
