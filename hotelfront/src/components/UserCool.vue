@@ -86,7 +86,7 @@ import api from '@/api';
 const baseURL = `${api.baseURL}/cool`;
 let reconnectTimer = null;
 let isConnected = false;
-const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
+const wsURL = `ws://10.29.12.98:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 export default {
   data() {
     return {
@@ -101,7 +101,7 @@ export default {
       price: '',
       statusText: '',
       airConditioningProperties: {
-
+        mode: '',
         count: '',
         upperBoundTemperature: '',
         lowerBoundTemperature: '',
@@ -128,9 +128,12 @@ export default {
   },
 
   computed: {
+    
 
     tableData() {
+      let modeText = this.mode == -1 ? "制冷" : "制热";
       return [
+        { parameter: '空调模式', value: modeText },
         { parameter: '空调台数', value: this.airConditioningProperties.count },
         { parameter: '上限温度', value: this.airConditioningProperties.upperBoundTemperature + '℃' },
         { parameter: '下限温度', value: this.airConditioningProperties.lowerBoundTemperature + '℃' },

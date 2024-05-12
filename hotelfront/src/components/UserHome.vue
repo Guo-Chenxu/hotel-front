@@ -29,7 +29,7 @@
 
 
 <script>
-const wsURL = `ws://10.29.23.17:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
+const wsURL = `ws://10.29.12.98:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 import { ElIcon } from 'element-plus';
 import { Timer } from '@element-plus/icons';
 import store from '@/store';
