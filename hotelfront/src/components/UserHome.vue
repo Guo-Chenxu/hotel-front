@@ -29,7 +29,6 @@
 
 
 <script>
-const wsURL = `ws://10.29.12.98:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 import { ElIcon } from 'element-plus';
 import { Timer } from '@element-plus/icons';
 import store from '@/store';
@@ -50,8 +49,8 @@ export default {
         Timer
     },
     mounted() {
+        this.setupWebSocket()
         this.getTimer()
-        this.setupWebSocket();
     },
     data() {
         return {
@@ -75,7 +74,7 @@ export default {
     methods: {
         setupWebSocket() {
             
-            const ws = new WebSocket(wsURL);
+            const ws = new WebSocket(`${api.wsURL}/${localStorage.getItem('userId')}`);
 
             ws.onopen = () => {
                 store.dispatch('setWebSocket', ws);

@@ -86,7 +86,6 @@ import api from '@/api';
 const baseURL = `${api.baseURL}/cool`;
 let reconnectTimer = null;
 let isConnected = false;
-const wsURL = `ws://10.29.12.98:29050/api/customer/cool/watchAC/${localStorage.getItem('userId')}`;
 export default {
   data() {
     return {
@@ -187,8 +186,7 @@ export default {
     },
 
     reconnectWebSocket() {
-      //if (!isConnected) {
-        const newWs = new WebSocket(wsURL);
+        const newWs = new WebSocket(`${api.wsURL}/${localStorage.getItem('userId')}`);
         this.setupReconnectTimer();
         newWs.onopen = () => {
           store.dispatch('setWebSocket', newWs);
@@ -200,11 +198,11 @@ export default {
           this.handleWebSocketMessage(event);
         };
         
-      //}
     },
 
     handleWebSocketMessage(event) {
       const data = JSON.parse(event.data);
+      console.log(data)
       this.currentTemperature = data.temperature.toFixed(2);
       this.status = data.status;
       this.changeTmp = data.changeTemp != null ? data.changeTemp : '';
