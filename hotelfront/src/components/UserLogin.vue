@@ -31,13 +31,13 @@
 <script>
 
 import axios from 'axios';
-import api from '@/api'; 
+import api from '@/api';
 const baseURL = `${api.baseURL}/customer/login`;
 export default {
   name: 'UserLogin',
   data() {
     return {
-      isLogin:false,
+      isLogin: false,
       username: '',
       roomId: '',
       isLoggedIn: false,
@@ -53,29 +53,30 @@ export default {
           url: `${baseURL}?name=${this.username}&room=${this.roomId}`,
         }).then(response => {
           if (response.data.code == 200) {
-            
+
             localStorage.setItem('token', response.data.data.token);
             localStorage.setItem('roomId', response.data.data.room);
             localStorage.setItem('userId', response.data.data.customerId);
-            this.$router.push('/home');
+
             this.isLogin = true;
-            if(this.isLogin) {
+            if (this.isLogin) {
+              this.$router.push('/home');
               // 监控空调
-            axios({
-              method: 'get',
-              url: `${api.baseURL}/cool/watchAC`,
-              headers: {
-                Authorization: localStorage.getItem('token')
-              },
-            }).then(response => {
-              if (response.data.code != 200) {
-                console.error(response.data.message);
-              }
-            }).catch(error => {
-              console.error("请求失败：", error.message || "未知错误");
-            });
+              axios({
+                method: 'get',
+                url: `${api.baseURL}/cool/watchAC`,
+                headers: {
+                  Authorization: localStorage.getItem('token')
+                },
+              }).then(response => {
+                if (response.data.code != 200) {
+                  console.error(response.data.message);
+                }
+              }).catch(error => {
+                console.error("请求失败：", error.message || "未知错误");
+              });
             }
-            
+
           } else {
             console.error("error:" + response.data.message);
           }
