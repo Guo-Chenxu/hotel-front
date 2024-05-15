@@ -229,6 +229,10 @@ export default {
           this.fanSpeed = 0;
           this.statusText = "等待";
           break;
+        case 5:
+          this.fanSpeed = 0;
+          this.statusText = "回温";
+          break;
         default:
           break;
       }
@@ -264,7 +268,7 @@ export default {
         this.targetTemperatureValue = this.targetTemperature
         this.fanSpeed = this.fanSpeedOff
         this.changeAC();
-      } else if (this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4) {
+      } else if (this.status == 1 || this.status == 2 || this.status == 3 || this.status == 4 || this.status == 5) {
         this.turnOffAC();
       }
 
