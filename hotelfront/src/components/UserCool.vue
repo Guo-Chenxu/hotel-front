@@ -49,6 +49,12 @@
               <div class="led-row">
                 <el-text>空调价格: {{ price }}</el-text>
               </div>
+              <div class="led-row">
+                <el-text>当前费用: {{ currentPrice }}</el-text>
+              </div>
+              <div class="led-row">
+                <el-text>累计费用: {{ totalPrice }}</el-text>
+              </div>
 
             </div>
             <!-- 下半部分：调节按钮 -->
@@ -95,6 +101,8 @@ export default {
       targetTemperature: null,
       fanSpeedOff: '',
       targetTemperatureValue: 25,
+      currentPrice: '',
+      totalPrice: '',
       status: '',
       fanSpeed: 1,
       price: '',
@@ -190,10 +198,8 @@ export default {
         this.setupReconnectTimer();
         newWs.onopen = () => {
           store.dispatch('setWebSocket', newWs);
-          //this.setupWebSocket();
         };
         newWs.onmessage = (event) => {
-          //isConnected = true;
           this.resetReconnectTimer();
           this.handleWebSocketMessage(event);
         };
@@ -208,6 +214,8 @@ export default {
       this.changeTmp = data.changeTemp != null ? data.changeTemp : '';
       this.targetTemperatureValue = data.targetTemp != null ? data.targetTemp : '';
       this.price = data.price != null ? data.price : '';
+      this.currentPrice = parseFloat(data.currentPrice).toFixed(3) != null ? parseFloat(data.currentPrice).toFixed(3) : '';
+      this.totalPrice = parseFloat(data.totalPrice).toFixed(3) != null ? parseFloat(data.totalPrice).toFixed(3) : '';
       switch (data.status) {
         case 0:
           this.fanSpeed = 0;
@@ -234,6 +242,8 @@ export default {
           this.statusText = "回温";
           break;
         default:
+          this.fanSpeed = 0;
+          this.statusText = "关机";
           break;
       }
     },
