@@ -11,66 +11,124 @@
             </template>
             <!-- 上半部分：温度、风速、空调状态 -->
             <div class="status-display">
+              <!-- 第一排：风速 -->
               <div class="led-row">
-                <el-text>当前温度: </el-text>
-                <span>{{ currentTemperature }}</span>
-                <span>°C</span>
+                <el-icon :size="20" color="blue">
+                  <Cloudy />
+                </el-icon>
+                <el-text style="margin-left: 5px; margin-bottom: 3px;">风速:</el-text>
+                <div class="fan-speed-icons">
+                  <template v-for="index in fanSpeedIcons">
+                    <el-icon style="font-size: 30px; color: blue; margin-right: 10px;">
+                      <WindPower />
+                    </el-icon>
+
+                  </template>
+                </div>
               </div>
+
+              <!-- 分隔线 -->
+
+
+              <!-- 第二排：温度 -->
+              <div class="led-row" style="display: flex; justify-content: space-between;">
+                <div class="temperature-left" style="display: flex; align-items: center;">
+                  <el-icon :size="20" color="red">
+                    <Odometer />
+                  </el-icon>
+                  <el-text style="margin-left: 5px; margin-bottom: 3px;">当前温度:</el-text>
+                  <div style="margin-left: 5px;">
+                    <span class="current-temperature" style="color: red; font-size: 50px;">{{ currentTemperature
+                      }}</span>
+                    <span class="unit" style="color: red; font-size: 50px;">°C</span>
+                  </div>
+                </div>
+
+
+
+
+                <div class="temperature-right" style="display: flex; flex-direction: column;">
+                  <div class="led-row">
+                    <el-text style="margin-bottom: 5px;margin-left:-50px">预期温度:</el-text>
+                  </div>
+
+
+                  <div class="led-row" style="display: flex; align-items: center;margin-left:20px">
+                    <div v-if="this.status == 0">
+                      <el-input-number v-model="targetTemperature" size="large" style="font-size: 40px;">
+                      </el-input-number>
+                    </div>
+                    <div v-if="this.status != 0">
+                      <el-input-number v-model="targetTemperatureValue" size="large" style="font-size: 40px;"
+                        @change="changeAC"></el-input-number>
+                    </div>
+                    <span class="unit" style="color: lightblue; font-size: 40px;">°C</span>
+                  </div>
+                </div>
+
+              </div>
+              <!-- 第三排：空调状态 -->
               <div class="led-row">
-                <el-text>预期温度: </el-text>
+                <div>
+                  <el-icon :size="20" style="margin-right: 5px; margin-bottom: 5px;">
+                    <Monitor />
+                  </el-icon>
+                  <el-text>空调状态: {{ statusText }}</el-text>
+                </div>
+              </div>
+              <div class="led-row" style="margin-top:20px">
+                <div>
+                  <el-icon :size="20" style="margin-right: 5px;">
+                    <Odometer />
+                  </el-icon>
+                  <el-text>空调每分钟变化温度: {{ changeTmp }}</el-text>
+                </div>
+              </div>
+            </div>
+
+            <!-- 下半部分：调节按钮 -->
+            <div class="control-buttons-wrapper" style="display: flex; justify-content: center; margin-top: 20px;">
+              <div class="control-buttons">
+                <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn" style="margin-right:50px">{{
+                  this.status ==
+                    0 ? '开启' :
+                    '关闭'
+                }}
+                </el-button>
                 <div v-if="this.status == 0">
-                  <el-input-number v-model="targetTemperature" controls-position="right" style=" width:100px">
-                  </el-input-number>
+                  <el-button @click="adjustFanSpeedOff">调节风速</el-button>
                 </div>
                 <div v-if="this.status != 0">
-                  <el-input-number v-model="targetTemperatureValue" controls-position="right" style=" width:100px"
-                    @change="changeAC">
-                  </el-input-number>
+                  <el-button @click="adjustFanSpeed">调节风速</el-button>
                 </div>
-                <span>°C</span>
-              </div>
-              <div class="led-row">
-                <el-text>空调状态: {{ statusText }}</el-text>
-              </div>
-              <div v-if="this.status == 0">
-                <div class="led-row">
-                  <el-text>风速: {{ fanSpeedOff }}</el-text>
-                </div>
-              </div>
-              <div v-if="this.status != 0">
-                <div class="led-row">
-                  <el-text>风速: {{ fanSpeed }}</el-text>
-                </div>
-              </div>
-
-              <div class="led-row">
-                <el-text>空调每分钟变化温度: {{ changeTmp }}</el-text>
-              </div>
-              <div class="led-row">
-                <el-text>空调价格: {{ price }}</el-text>
-              </div>
-              <div class="led-row">
-                <el-text>当前费用: {{ currentPrice }}</el-text>
-              </div>
-              <div class="led-row">
-                <el-text>累计费用: {{ totalPrice }}</el-text>
-              </div>
-
-            </div>
-            <!-- 下半部分：调节按钮 -->
-            <div class="control-buttons">
-
-              <el-button :type="this.status == 0 ? 'success' : 'danger'" @click="turn">{{ this.status == 0 ? '开启' :
-                '关闭' }}</el-button>
-              <div v-if="this.status == 0">
-                <el-button @click="adjustFanSpeedOff">调节风速</el-button>
-              </div>
-              <div v-if="this.status != 0">
-                <el-button @click="adjustFanSpeed">调节风速</el-button>
               </div>
             </div>
+
           </el-card>
+          <el-card class="price-card" shadow="always">
+            <template #header>
+              <div class="card-header">
+                <span>价格信息</span>
+              </div>
+            </template>
 
+            <el-table :data="priceData" style="width: 100%; font-size: 18px; font-weight: bold; color: #333;">
+              <el-table-column label="项目">
+                <template v-slot="scope">
+                  <div>
+                    <el-icon :size="20">
+                      <Money />
+                    </el-icon>
+                    {{ scope.row.name }}
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="value" label="金额"></el-table-column>
+            </el-table>
+
+
+
+          </el-card>
         </div>
       </el-tab-pane>
       <el-tab-pane label="查看空调参数" name="tab2">
@@ -89,10 +147,17 @@
 import store from '@/store';
 import axios from 'axios';
 import api from '@/api';
+import { WindPower, Odometer, Cloudy, Monitor } from '@element-plus/icons';
 const baseURL = `${api.baseURL}/cool`;
 let reconnectTimer = null;
 let isConnected = false;
 export default {
+  components: {
+    WindPower,
+    Odometer,
+    Cloudy,
+    Monitor
+  },
   data() {
     return {
       activeTab: 'tab1',
@@ -127,6 +192,7 @@ export default {
           price: ""
         }
       },
+
     }
   },
   mounted() {
@@ -135,7 +201,22 @@ export default {
   },
 
   computed: {
-    
+    priceData() {
+      return [
+        { name: '空调价格', value: this.price },
+        { name: '当前费用', value: this.currentPrice },
+        { name: '累计费用', value: this.totalPrice }
+      ];
+    },
+
+    fanSpeedIcons() {
+      const icons = [];
+      const fanSpeed = this.status == 0 ? parseInt(this.fanSpeedOff) : parseInt(this.fanSpeed);
+      for (let i = 0; i < fanSpeed; i++) {
+        icons.push(i);
+      }
+      return icons;
+    },
 
     tableData() {
       let modeText = this.airConditioningProperties.mode == 0 ? "制冷" : "制热";
@@ -194,16 +275,16 @@ export default {
     },
 
     reconnectWebSocket() {
-        const newWs = new WebSocket(`${api.wsURL}/${localStorage.getItem('userId')}`);
-        this.setupReconnectTimer();
-        newWs.onopen = () => {
-          store.dispatch('setWebSocket', newWs);
-        };
-        newWs.onmessage = (event) => {
-          this.resetReconnectTimer();
-          this.handleWebSocketMessage(event);
-        };
-        
+      const newWs = new WebSocket(`${api.wsURL}/${localStorage.getItem('userId')}`);
+      this.setupReconnectTimer();
+      newWs.onopen = () => {
+        store.dispatch('setWebSocket', newWs);
+      };
+      newWs.onmessage = (event) => {
+        this.resetReconnectTimer();
+        this.handleWebSocketMessage(event);
+      };
+
     },
 
     handleWebSocketMessage(event) {
@@ -313,6 +394,7 @@ export default {
       let fanSpeedOff = parseInt(this.fanSpeedOff);
       fanSpeedOff = (fanSpeedOff < 3) ? fanSpeedOff + 1 : 1;
       this.fanSpeedOff = fanSpeedOff.toString();
+      console.log("this.fanSpeedOff" + this.fanSpeedOff)
     },
 
     changeAC() {
@@ -362,33 +444,185 @@ export default {
 
   margin-left: 60px;
   width: 80%;
-  display: flex;
-  flex-direction: column;
+
 }
 
 
 .control-panel {
-  width: 50%;
+  width: calc(65% - 20px);
+  /* 左侧宽度为50%，减去间隔 */
   padding: 20px;
   border-radius: 10px;
   margin-top: 50px;
-  margin-left: 250px;
+  margin-left: 10px;
+  /* 左侧面板的左边距 */
+  float: left;
+  /* 左浮动，使得右侧价格卡片在其旁边 */
+  height: 400px;
 }
 
 .status-display {
   margin-top: 20px;
 }
 
+/* Adjust layout of temperature rows */
 .led-row {
   display: flex;
   align-items: center;
-  margin-left: 30%;
-  margin-bottom: 10px;
+}
+
+.led-row el-text {
+  margin-right: 0;
+}
+
+
+.temperature-left,
+.temperature-right {
+  display: flex;
+  align-items: center;
+}
+
+.temperature-right {
+  text-align: right;
+}
+
+
+/* 控制左右两侧卡片排列 */
+.control-panel,
+.price-card {
+  margin-right: 20px;
+  /* 间隔 */
+  font-size: 18px;
+  /* Adjust the font size as needed */
 }
 
 .control-buttons {
   margin-top: 20px;
   display: flex;
   justify-content: space-between;
+}
+
+/* 价格卡片样式 */
+.price-card {
+  width: calc(35% - 20px);
+  /* 右侧宽度为50%，减去间隔 */
+  border-radius: 10px;
+  margin-top: 50px;
+  margin-right: 10px;
+  /* 右侧价格卡片的右边距 */
+  float: right;
+  /* 右浮动，使得价格卡片在右侧 */
+}
+
+/* 价格内容样式 */
+.price-content {
+  padding: 20px;
+  font-size: 18px;
+  /* Adjust the font size as needed */
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  /* 左右对齐 */
+}
+
+.temperature-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.temperature-label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.temperature {
+  font-size: 20px;
+  /* 加大字体 */
+  color: red;
+  /* 红色字体 */
+}
+
+.unit {
+  margin-left: 5px;
+  font-size: 16px;
+  color: #666;
+}
+
+.temperature-input {
+  width: 100px;
+}
+
+/* Align text to the left */
+.el-text,
+.led-row,
+.control-buttons {
+  text-align: left;
+}
+
+.fan-speed {
+  display: flex;
+  align-items: center;
+}
+
+
+/* Style for fan speed icons */
+.fan-speed-icons {
+  display: flex;
+  align-items: center;
+}
+
+.fan-speed-icons el-icon {
+  margin-right: 5px;
+  /* Adjust the margin between icons as needed */
+}
+
+.control-panel span,
+.control-panel el-text,
+.control-panel el-icon {
+  font-size: 18px;
+  /* Adjust the font size as needed */
+  font-weight: bold;
+  /* Make the font bold */
+  color: #575252;
+  /* Change the font color */
+}
+
+/* Adjust the font size and style for elements in the price card */
+.price-card span,
+.price-card el-text,
+.price-card el-icon {
+  font-size: 18px;
+  /* Adjust the font size as needed */
+  font-weight: bold;
+  /* Make the font bold */
+  color: #333;
+  /* Change the font color */
+}
+
+/* Adjust the font size and style for temperature labels and values */
+.temperature-left el-text,
+.temperature-left .current-temperature,
+.temperature-left .unit,
+.temperature-right el-text,
+.temperature-right .current-temperature,
+.temperature-right .unit {
+  font-size: 24px;
+  /* Adjust the font size as needed */
+  font-weight: bold;
+  /* Make the font bold */
+  color: red;
+  /* Change the font color */
+}
+
+/* Adjust the font size and style for buttons in the control panel */
+.control-buttons el-button {
+  font-size: 18px;
+  /* Adjust the font size as needed */
+  font-weight: bold;
+  /* Make the font bold */
+  color: white;
+  /* Change the font color */
 }
 </style>
