@@ -299,7 +299,7 @@ export default {
                 this.SNACK = true;
             axios({
                 method: 'get',
-                url: `${baseURL}/billStatement/?type=${types}`,
+                url: `${baseURL}/billStatement?type=${types}`,
                 headers: {
                     Authorization: localStorage.getItem('token')
                 },
@@ -441,7 +441,7 @@ export default {
             } else {
                 axios({
                     method: 'get',
-                    url: `${baseURL}/downloadBillStatement/?type=${types}`,
+                    url: `${baseURL}/downloadBillStatement?type=${types}`,
                     headers: {
                         Authorization: localStorage.getItem('token')
                     },

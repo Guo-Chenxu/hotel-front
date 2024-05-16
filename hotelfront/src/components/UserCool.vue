@@ -376,7 +376,8 @@ export default {
         if (response.data.code === 200) {
 
           this.$message.success("关闭空调成功")
-
+          this.targetTemperature = null;
+          this.fanSpeedOff = null;
         } else {
           this.$message.error(response.data.message)
         }
